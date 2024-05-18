@@ -1,11 +1,12 @@
 'use client'
+import { ExperiencesTable } from "@/components/Experiences/ExperiencesTable";
 import { ParticipantsTable } from "@/components/Participants/ParticipantsTable";
 import { ActionIcon, AppShell, Text, Burger, Card, Flex, Input, Table, Tabs, Title } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IconDoorExit, IconEdit, IconLogout, IconPencil, IconSearch, IconTrash, IconUserEdit } from "@tabler/icons-react";
 import { capitalize } from "lodash";
 import Image from "next/image";
-
+import { useState } from "react";
 enum TabsValues {
     Dashboard = "dashboard",
     Participants = "participants",
@@ -13,12 +14,11 @@ enum TabsValues {
     Profile = "profile",
     Analyzer = "analyzer",
 }
-
 export default function Participants() {
     const [opened, { toggle }] = useDisclosure();
-
+    const [currentValue, setCurrentValue] = useState(TabsValues.Participants);
     return (
-        <Tabs variant="pills" defaultValue={TabsValues.Participants} orientation="vertical">
+        <Tabs onChange={(value)=>setCurrentValue(value as TabsValues)} variant="pills" defaultValue={TabsValues.Participants} orientation="vertical">
             <AppShell
                 w={'100%'}
                 navbar={{
@@ -43,11 +43,11 @@ export default function Participants() {
                 </AppShell.Navbar>
 
                 <AppShell.Main style={{ background: "#F4F7FE" }}>
+                    
+                    <Flex align={'center'} >
                     <Title size={'20px'}>
-                        Participants
+                        {capitalize(currentValue)}
                     </Title>
-                    <Flex align={'center'} h={48}>
-
 
                         <Card style={{ borderRadius: 300 }} p={"6px 16px"} ml={'auto'} shadow="xs">
                             <Flex gap={8} align={'center'} justify={'center'}>
@@ -62,6 +62,9 @@ export default function Participants() {
                     </Flex>
                     <Tabs.Panel mt={36} value={TabsValues.Participants}>
                         <ParticipantsTable />
+                    </Tabs.Panel>
+                    <Tabs.Panel mt={36} value={TabsValues.Experiences}>
+                        <ExperiencesTable/>
                     </Tabs.Panel>
                 </AppShell.Main>
             </AppShell>

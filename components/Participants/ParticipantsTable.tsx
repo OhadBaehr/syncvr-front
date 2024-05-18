@@ -37,12 +37,12 @@ export function ParticipantsTable() {
                             <IconSearch />
                         </ActionIcon>
                     }
-                        styles={{ input: { borderRadius: 300 } }} placeholder={'Search for an experience...'}
+                        styles={{ input: { borderRadius: 300 } }} placeholder={'Search for a Partipiant...'}
                     />
                 </Input.Wrapper>
 
                 <Input.Wrapper ml={'auto'} label={'Sort by'}>
-                    <Select data={['Last Experience']} />
+                    <Select data={['Last Experience']} value={'Last Experience'} />
                 </Input.Wrapper>
             </Flex>
             <Card mt={16} shadow="xs">
