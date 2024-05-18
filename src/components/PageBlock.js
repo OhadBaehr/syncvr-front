@@ -6,7 +6,7 @@ import axios from "axios";
 const PageBlock = () => {
   const [counter, setCounter] = useState(1);
   const [pokemons, setPokemons] = useState(null);
-
+  console.log("hey");
   useEffect(() => {
     try {
       axios.get("https://pokeapi.co/api/v2/pokemon").then((res) => {
