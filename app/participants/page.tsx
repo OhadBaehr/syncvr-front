@@ -1,6 +1,7 @@
 'use client'
 import { ExperiencesTable } from "@/components/Experiences/ExperiencesTable";
 import { ParticipantsTable } from "@/components/Participants/ParticipantsTable";
+import { ScheduledExperiences } from "@/components/Scheduler/ScheduledExperiences";
 import { ActionIcon, AppShell, Text, Burger, Card, Flex, Input, Table, Tabs, Title } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IconDoorExit, IconEdit, IconLogout, IconPencil, IconSearch, IconTrash, IconUserEdit } from "@tabler/icons-react";
@@ -8,11 +9,10 @@ import { capitalize } from "lodash";
 import Image from "next/image";
 import { useState } from "react";
 enum TabsValues {
-    Dashboard = "dashboard",
+    Scheduler = "scheduler",    
     Participants = "participants",
     Experiences = "experiences",
-    Profile = "profile",
-    Analyzer = "analyzer",
+
 }
 export default function Participants() {
     const [opened, { toggle }] = useDisclosure();
@@ -60,6 +60,9 @@ export default function Participants() {
                             </Flex>
                         </Card>
                     </Flex>
+                    <Tabs.Panel mt={36} value={TabsValues.Scheduler}>
+                        <ScheduledExperiences />
+                    </Tabs.Panel>
                     <Tabs.Panel mt={36} value={TabsValues.Participants}>
                         <ParticipantsTable />
                     </Tabs.Panel>
