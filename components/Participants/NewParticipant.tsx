@@ -21,9 +21,8 @@ export function NewParticipant({ disclosure, onCreateParticipant }: { disclosure
       email,
       sex,
     };
-    onCreateParticipant(newParticipant); // Call onCreateParticipant with the new participant data
+    onCreateParticipant(newParticipant); 
     close();
-    // Clear the inputs
     setName('');
     setEmail('');
     setSex('');
