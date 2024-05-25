@@ -1,39 +1,30 @@
-'use client';
-
 import React, { useContext, useState } from 'react';
-import {
-  ActionIcon,
-  Card,
-  Flex,
-  Input,
-  Select,
-  Table,
-  Button,
-  Title,
-} from '@mantine/core';
+import { ActionIcon, Card, Flex, Input, Select, Table, Button, Title, Modal } from '@mantine/core';
 import { IconPencil, IconSearch, IconTrash } from '@tabler/icons-react';
 import { StoreContext } from '@/store/context';
+import { useDisclosure } from '@mantine/hooks';
+import { NewParticipant } from './NewParticipant';
 
 export function ParticipantsTable() {
   const [store, setStore] = useContext(StoreContext);
-  const [newParticipant, setNewParticipant] = useState({
-    name: '',
-    email: '',
-    sex: 'male',
-    lastExperience: new Date().toLocaleDateString(),
-  });
+  const [opened, { open, close, toggle }] = useDisclosure(false);
+
+  const [isNewParticipantModalOpen, setIsNewParticipantModalOpen] = useState(false); 
 
   const addParticipant = () => {
+    setIsNewParticipantModalOpen(true); 
+  };
+
+  const handleCreateParticipant = (participant) => {
+    const newParticipant = {
+      ...participant,
+      lastExperience: '-',
+    };
     setStore((prevState) => ({
       ...prevState,
       participants: [...prevState.participants, newParticipant],
     }));
-    setNewParticipant({
-      name: '',
-      email: '',
-      sex: 'male',
-      lastExperience: new Date().toLocaleDateString(),
-    });
+    setIsNewParticipantModalOpen(false);
   };
 
   const rows = store.participants.map((element) => (
@@ -79,7 +70,7 @@ export function ParticipantsTable() {
       <Card mt={16} shadow="xs">
         <Flex justify="space-between" align="center">
           <Title size="16px">Accounts</Title>
-          <Button onClick={addParticipant}>Add Participant</Button>
+          <Button onClick={open}>Add Participant</Button>
         </Flex>
         <Table mt={20}>
           <Table.Thead>
@@ -95,6 +86,10 @@ export function ParticipantsTable() {
           <Table.Tbody>{rows}</Table.Tbody>
         </Table>
       </Card>
+      <NewParticipant
+        disclosure={[opened, { open, close, toggle }]}
+        onCreateParticipant={handleCreateParticipant}
+      />
     </>
   );
 }

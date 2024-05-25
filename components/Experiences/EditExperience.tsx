@@ -9,6 +9,8 @@ import {
   ResponsiveContainer,
   BarChart,
   Bar,
+  Legend,
+  Label
 } from 'recharts';
 import { Title, Card, Input, Select, Flex, Button } from '@mantine/core';
 import { Note } from './Note';
@@ -54,25 +56,14 @@ export function EditExperience() {
             </Title>
             <Flex align="center" mb={10}>
               <Input.Wrapper ml="auto" label="Mode">
-                <Select
-                  data={selectOptions}
-                  value={mode}
-                  onChange={handleModeChange}
-                />
+                <Select data={selectOptions} value={mode} onChange={handleModeChange} />
               </Input.Wrapper>
               <Input.Wrapper ml={10} label="Synchronization Algorithm">
-                <Select
-                  data={algoOptions}
-                  value={syncAlgo}
-                  onChange={handleSyncAlgoChange}
-                />
+                <Select data={algoOptions} value={syncAlgo} onChange={handleSyncAlgoChange} />
               </Input.Wrapper>
             </Flex>
             <ResponsiveContainer width="100%" height={400}>
-              <AreaChart
-                data={synclevel}
-                margin={{ top: 20, right: 30, left: 40, bottom: 20 }}
-              >
+              <AreaChart data={synclevel} margin={{ top: 20, right: 30, left: 40, bottom: 20 }}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis
                   dataKey="time"
@@ -102,40 +93,46 @@ export function EditExperience() {
             </ResponsiveContainer>
           </Card>
           <Card>
-          <Title size="16px" order={2} mb={20}>
-              Interpersonal Connection Forms
-            </Title>
-            <ResponsiveContainer width="100%" height={400}>
-              <BarChart data={personalForms}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis
-                  dataKey="question"
-                  label={{
-                    value: 'Question',
-                    position: 'insideBottom',
-                    offset: -10,
-                    dy: 10,
-                    style: { textAnchor: 'middle' },
-                  }}
-                  tickFormatter={(value) => `q${value.slice(1)}`}
-                />
-                <YAxis
-                  domain={[0, 5]}
-                  ticks={[0, 1, 2, 3, 4, 5]} 
-                  label={{
-                    value: 'Score',
-                    angle: -90,
-                    position: 'insideLeft',
-                    dx: -30,
-                    style: { textAnchor: 'middle' },
-                  }}
-                />
-                <Tooltip />
-                <Bar dataKey="answer1" fill="#8884d8" name="Itay" />
-                <Bar dataKey="answer2" fill="#82ca9d" name="Ohad" />
-              </BarChart>
-            </ResponsiveContainer>
-          </Card>
+  <Title size="16px" order={2}>
+    Interpersonal Connection Forms
+  </Title>
+  <ResponsiveContainer width="100%" height={500}>
+    <BarChart data={personalForms} margin={{ bottom: 40 }}>
+      <CartesianGrid strokeDasharray="3 3" />
+      <XAxis
+        dataKey="question"
+        label={{
+          value: 'Question',
+          offset: 0,
+          position: 'insideBottom',
+          dy: 20,
+        }}
+        tickFormatter={(value) => `q${value.slice(1)}`}
+      />
+      <YAxis
+        domain={[0, 5]}
+        ticks={[0, 1, 2, 3, 4, 5]} 
+        label={{
+          value: 'Score',
+          angle: -90,
+          position: 'insideLeft',
+          style: { textAnchor: 'middle' },
+        }}
+      />
+      <Tooltip />
+      <Legend verticalAlign="top" align="right" height={36}/>
+      <Bar dataKey="answer1" fill="#8884d8" name="Itay" />
+      <Bar dataKey="answer2" fill="#82ca9d" name="Ohad" />
+    </BarChart>
+  </ResponsiveContainer>
+</Card>
+
+
+
+
+
+
+
         </Flex>
         <Card>
           <Flex justify="space-between" align="center" style={{ marginBottom: '10px' }}>
