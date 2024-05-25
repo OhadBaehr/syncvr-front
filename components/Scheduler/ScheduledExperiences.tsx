@@ -1,5 +1,4 @@
 'use client';
-
 import { ActionIcon, Card, Flex, Group, Input, Select, Table, Text, Title, Button } from '@mantine/core';
 import { IconPencil, IconSearch, IconTrash } from '@tabler/icons-react';
 import { useDisclosure } from '@mantine/hooks';
