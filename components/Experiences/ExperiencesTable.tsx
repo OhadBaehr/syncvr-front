@@ -1,7 +1,9 @@
 'use client';
+
 import { ActionIcon, Card, Flex, Group, Input, Select, Table, Text, Title } from '@mantine/core';
 import { IconPencil, IconSearch, IconTrash } from '@tabler/icons-react';
 import { EditExperience } from './EditExperience';
+
 export function ExperiencesTable() {
   const elements = [
     {
@@ -43,9 +45,9 @@ export function ExperiencesTable() {
     </Table.Tr>
   ));
   return (
-    <Flex direction={'column'}w={'100%'}>
-      <Flex align={'flex-end'}>
-        <Input.Wrapper label={'7/221 Displayed'}>
+    <Flex direction="column" w="100%">
+      <Flex align="flex-end">
+        <Input.Wrapper label="7/221 Displayed">
           <Input
             w={450}
             maw={450}
@@ -55,16 +57,16 @@ export function ExperiencesTable() {
               </ActionIcon>
             }
             styles={{ input: { borderRadius: 300 } }}
-            placeholder={'Search for an Experience...'}
+            placeholder="Search for an Experience..."
           />
         </Input.Wrapper>
 
-        <Input.Wrapper ml={'auto'} label={'Sort by'}>
+        <Input.Wrapper ml="auto" label="Sort by">
           <Select data={['Last Experience (Increasing)']} value="Last Experience (Increasing)" />
         </Input.Wrapper>
       </Flex>
       <Card mt={16} shadow="xs">
-        <Title size={'16px'}>Sessions</Title>
+        <Title size="16px">Sessions</Title>
         <Table>
           <Table.Thead>
             <Table.Tr>
@@ -79,7 +81,7 @@ export function ExperiencesTable() {
           <Table.Tbody>{rows}</Table.Tbody>
         </Table>
       </Card>
-      <EditExperience></EditExperience>
+      <EditExperience />
     </Flex>
   );
 }

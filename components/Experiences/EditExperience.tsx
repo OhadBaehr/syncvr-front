@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import {
   AreaChart,
   Area,
@@ -11,8 +11,12 @@ import {
 import { Title, Card, Input, Select, Flex, Button } from '@mantine/core';
 import { BarChart } from '@mantine/charts';
 import { Note } from './Note';
+import { StoreContext } from '@/store/context';
 
 export function EditExperience() {
+  const [store, setStore] = useContext(StoreContext);
+  const { participants } = store;
+  console.log(store.participants, participants, setStore);
   const sampleData = [
     { time: '0s', value: 0 },
     { time: '10s', value: 10 },
@@ -73,8 +77,8 @@ export function EditExperience() {
       <Title mt={10} mb={20} size="20px">
         Ohad Beahr & Itay Aharoni - 27/3/24
       </Title>
-      <Flex wrap={'wrap'} w={'100%'}>
-        <Flex direction={'column'}>
+      <Flex wrap="wrap" gap={24}>
+        <Flex flex={1} direction="column">
           <Card mr={5} mb={20}>
             <Title size="16px" order={2}>
               Synchronization Over Time
@@ -137,7 +141,7 @@ export function EditExperience() {
                 { name: 'Itay', color: 'violet.6' },
                 { name: 'Ohad', color: 'blue.6' },
               ]}
-              dataKey={'question'}
+              dataKey="question"
             >
               <XAxis
                 dataKey="question"

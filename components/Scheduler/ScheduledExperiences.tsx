@@ -1,13 +1,16 @@
-'use client'
-import { ActionIcon, Card, Flex, Group, Input, Select, Table, Text, Title, Button} from "@mantine/core";
-import { IconPencil, IconSearch, IconTrash } from "@tabler/icons-react";
-import { Configuration } from "./Configuration";
+'use client';
+
+import { ActionIcon, Card, Flex, Group, Input, Select, Table, Text, Title, Button } from '@mantine/core';
+import { IconPencil, IconSearch, IconTrash } from '@tabler/icons-react';
+import { useDisclosure } from '@mantine/hooks';
+import { Configuration } from './Configuration';
 
 export function ScheduledExperiences() {
+    const [opened, { open, close, toggle }] = useDisclosure(false);
     const elements = [
-        { date: "27/3/24", level: "74", participant2: 'itay45977@gmail.com', participant1: 'ohad@gmail.com', createdBy: 'Michal Rinott' },
-        { date: "30/3/24", level: "69", participant2: 'nikol@gmail.com', participant1: 'noam@gmail.com', createdBy: 'Michal Rinott'  },
-        { date: "31/3/24", level: "40", participant2: 'ilan@gmail.com', participant1: 'jecki@gmail.com',createdBy: 'Michal Rinott'  }
+        { date: '27/3/24', level: '74', participant2: 'itay45977@gmail.com', participant1: 'ohad@gmail.com', createdBy: 'Michal Rinott' },
+        { date: '30/3/24', level: '69', participant2: 'nikol@gmail.com', participant1: 'noam@gmail.com', createdBy: 'Michal Rinott' },
+        { date: '31/3/24', level: '40', participant2: 'ilan@gmail.com', participant1: 'jecki@gmail.com', createdBy: 'Michal Rinott' },
     ];
 
     const rows = elements.map((element) => (
@@ -31,20 +34,30 @@ export function ScheduledExperiences() {
     ));
     return (
         <>
-            <Flex align={'flex-end'}>
-                <Input.Wrapper label={'3/8 Displayed'}>
-                    <Input w={450} maw={450} leftSection={
-                        <ActionIcon variant="subtle">
-                            <IconSearch />
-                        </ActionIcon>
-                    }
-                        styles={{ input: { borderRadius: 300 } }} placeholder={'Search for an Experience...'}
+            <Flex align="flex-end">
+                <Input.Wrapper label="3/8 Displayed">
+                    <Input
+                        w={450}
+                        maw={450}
+                        leftSection={
+                            <ActionIcon variant="subtle">
+                                <IconSearch />
+                            </ActionIcon>
+                        }
+                        styles={{ input: { borderRadius: 300 } }}
+                        placeholder="Search for an Experience..."
                     />
                 </Input.Wrapper>
 
             </Flex>
             <Card mt={16} shadow="xs">
-                <Title size={"20px"} mb={10}>Scheduled Experiences</Title>
+                <Flex>
+                    <Title size="20px" mb={10}>Scheduled Experiences</Title>
+                    <Button onClick={open} ml="auto">
+                        Schedule New Experience
+                    </Button>
+                </Flex>
+
                 <Table>
                     <Table.Thead>
                         <Table.Tr>
@@ -54,19 +67,12 @@ export function ScheduledExperiences() {
                             <Table.Th>Date</Table.Th>
                             <Table.Th>Edit</Table.Th>
                             <Table.Th>Delete</Table.Th>
-                            <Table.Th>
-                                <Button>
-                                    Schedule New Experience
-                                </Button>
-                            </Table.Th>
                         </Table.Tr>
                     </Table.Thead>
                     <Table.Tbody>{rows}</Table.Tbody>
                 </Table>
             </Card>
-            <Configuration>
-                
-            </Configuration>
+            <Configuration disclosure={[opened, { open, close, toggle }]} />
         </>
-    )
+    );
 }
