@@ -7,31 +7,16 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
+  BarChart,
+  Bar,
 } from 'recharts';
 import { Title, Card, Input, Select, Flex, Button } from '@mantine/core';
-import { BarChart } from '@mantine/charts';
 import { Note } from './Note';
 import { StoreContext } from '@/store/context';
 
 export function EditExperience() {
-  const [store, setStore] = useContext(StoreContext);
-  const { participants } = store;
-  console.log(store.participants, participants, setStore);
-  const sampleData = [
-    { time: '0s', value: 0 },
-    { time: '10s', value: 10 },
-    { time: '20s', value: 30 },
-    { time: '30s', value: 50 },
-    { time: '40s', value: 70 },
-    { time: '50s', value: 90 },
-    { time: '60s', value: 60 },
-    { time: '70s', value: 80 },
-    { time: '80s', value: 40 },
-    { time: '90s', value: 20 },
-    { time: '100s', value: 30 },
-    { time: '110s', value: 50 },
-    { time: '120s', value: 70 },
-  ];
+  const [store] = useContext(StoreContext);
+  const { synclevel, personalForms } = store;
 
   const [mode, setMode] = useState('Hands');
   const [syncAlgo, setSyncAlgo] = useState('Pearson');
@@ -56,26 +41,10 @@ export function EditExperience() {
     disabled: option === syncAlgo,
   }));
 
-  const barChartData = [
-    { question: 'q1', Itay: 2, Ohad: 3 },
-    { question: 'q2', Itay: 1, Ohad: 4 },
-    { question: 'q3', Itay: 4, Ohad: 2 },
-    { question: 'q4', Itay: 3, Ohad: 1 },
-    { question: 'q5', Itay: 5, Ohad: 2 },
-    { question: 'q6', Itay: 4, Ohad: 1 },
-    { question: 'q7', Itay: 3, Ohad: 1 },
-    { question: 'q8', Itay: 4, Ohad: 5 },
-    { question: 'q9', Itay: 5, Ohad: 5 },
-    { question: 'q10', Itay: 3, Ohad: 5 },
-  ];
-
-  // Adjusted y-axis ticks to go from 0 to 5
-  const yAxisTicks = Array.from({ length: 6 }, (_, i) => i);
-
   return (
     <>
       <Title mt={10} mb={20} size="20px">
-        Ohad Beahr & Itay Aharoni - 27/3/24
+        Ohad Beahr & Itay Aharoni - 27.3.24
       </Title>
       <Flex wrap="wrap" gap={24}>
         <Flex flex={1} direction="column">
@@ -88,19 +57,22 @@ export function EditExperience() {
                 <Select
                   data={selectOptions}
                   value={mode}
-                  onChange={(value) => handleModeChange(value)}
+                  onChange={handleModeChange}
                 />
               </Input.Wrapper>
               <Input.Wrapper ml={10} label="Synchronization Algorithm">
                 <Select
                   data={algoOptions}
                   value={syncAlgo}
-                  onChange={(value) => handleSyncAlgoChange(value)}
+                  onChange={handleSyncAlgoChange}
                 />
               </Input.Wrapper>
             </Flex>
             <ResponsiveContainer width="100%" height={400}>
-              <AreaChart data={sampleData} margin={{ top: 20, right: 30, left: 40, bottom: 20 }}>
+              <AreaChart
+                data={synclevel}
+                margin={{ top: 20, right: 30, left: 40, bottom: 20 }}
+              >
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis
                   dataKey="time"
@@ -125,46 +97,44 @@ export function EditExperience() {
                   }}
                 />
                 <Tooltip />
-                <Area type="monotone" dataKey="value" stroke="#8884d8" fill="#8884d8" />
+                <Area type="monotone" dataKey="level" stroke="#8884d8" fill="#8884d8" />
               </AreaChart>
             </ResponsiveContainer>
           </Card>
           <Card>
-            <BarChart
-              h={400}
-              data={barChartData}
-              xAxisLabel="Question"
-              yAxisLabel="Score"
-              withLegend
-              legendProps={{ verticalAlign: 'bottom' }}
-              series={[
-                { name: 'Itay', color: 'violet.6' },
-                { name: 'Ohad', color: 'blue.6' },
-              ]}
-              dataKey="question"
-            >
-              <XAxis
-                dataKey="question"
-                label={{
-                  value: 'Question',
-                  position: 'insideBottom',
-                  offset: -10,
-                  dy: 10,
-                  style: { textAnchor: 'middle' },
-                }}
-                tickFormatter={(value) => `q${value.slice(1)}`}
-              />
-              <YAxis
-                ticks={yAxisTicks}
-                label={{
-                  value: 'Score',
-                  angle: -90,
-                  position: 'insideLeft',
-                  dx: -30,
-                  style: { textAnchor: 'middle' },
-                }}
-              />
-            </BarChart>
+          <Title size="16px" order={2} mb={20}>
+              Interpersonal Connection Forms
+            </Title>
+            <ResponsiveContainer width="100%" height={400}>
+              <BarChart data={personalForms}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis
+                  dataKey="question"
+                  label={{
+                    value: 'Question',
+                    position: 'insideBottom',
+                    offset: -10,
+                    dy: 10,
+                    style: { textAnchor: 'middle' },
+                  }}
+                  tickFormatter={(value) => `q${value.slice(1)}`}
+                />
+                <YAxis
+                  domain={[0, 5]}
+                  ticks={[0, 1, 2, 3, 4, 5]} 
+                  label={{
+                    value: 'Score',
+                    angle: -90,
+                    position: 'insideLeft',
+                    dx: -30,
+                    style: { textAnchor: 'middle' },
+                  }}
+                />
+                <Tooltip />
+                <Bar dataKey="answer1" fill="#8884d8" name="Itay" />
+                <Bar dataKey="answer2" fill="#82ca9d" name="Ohad" />
+              </BarChart>
+            </ResponsiveContainer>
           </Card>
         </Flex>
         <Card>

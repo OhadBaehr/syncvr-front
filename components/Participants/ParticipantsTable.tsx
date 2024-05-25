@@ -1,26 +1,42 @@
 'use client';
+
+import React, { useContext, useState } from 'react';
 import {
   ActionIcon,
   Card,
   Flex,
-  Group,
   Input,
   Select,
   Table,
-  Text,
-  Title,
   Button,
+  Title,
 } from '@mantine/core';
 import { IconPencil, IconSearch, IconTrash } from '@tabler/icons-react';
+import { StoreContext } from '@/store/context';
 
 export function ParticipantsTable() {
-  const elements = [
-    { lastExperience: '27/3/24', sex: 'male', email: 'itay45977@gmail.com', name: 'Itay Aharoni' },
-    { lastExperience: '27/3/24', sex: 'male', email: 'ohad@gmail.com', name: 'Ohad Baehr' },
-    { lastExperience: '27/3/24', sex: 'male', email: 'moran@gmail.com', name: 'Moran Amar' },
-  ];
+  const [store, setStore] = useContext(StoreContext);
+  const [newParticipant, setNewParticipant] = useState({
+    name: '',
+    email: '',
+    sex: 'male',
+    lastExperience: new Date().toLocaleDateString(),
+  });
 
-  const rows = elements.map((element) => (
+  const addParticipant = () => {
+    setStore((prevState) => ({
+      ...prevState,
+      participants: [...prevState.participants, newParticipant],
+    }));
+    setNewParticipant({
+      name: '',
+      email: '',
+      sex: 'male',
+      lastExperience: new Date().toLocaleDateString(),
+    });
+  };
+
+  const rows = store.participants.map((element) => (
     <Table.Tr key={element.name}>
       <Table.Td>{element.name}</Table.Td>
       <Table.Td>{element.email}</Table.Td>
@@ -38,6 +54,7 @@ export function ParticipantsTable() {
       </Table.Td>
     </Table.Tr>
   ));
+
   return (
     <>
       <Flex align={'flex-end'}>
@@ -51,7 +68,7 @@ export function ParticipantsTable() {
               </ActionIcon>
             }
             styles={{ input: { borderRadius: 300 } }}
-            placeholder={'Search for a Partipiant...'}
+            placeholder={'Search for a Participant...'}
           />
         </Input.Wrapper>
 
@@ -62,7 +79,7 @@ export function ParticipantsTable() {
       <Card mt={16} shadow="xs">
         <Flex justify="space-between" align="center">
           <Title size="16px">Accounts</Title>
-          <Button>Add Participant</Button>
+          <Button onClick={addParticipant}>Add Participant</Button>
         </Flex>
         <Table mt={20}>
           <Table.Thead>
