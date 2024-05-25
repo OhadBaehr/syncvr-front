@@ -4,16 +4,14 @@ import { ActionIcon, Card, Flex, Group, Input, Select, Table, Text, Title, Butto
 import { IconPencil, IconSearch, IconTrash } from '@tabler/icons-react';
 import { useDisclosure } from '@mantine/hooks';
 import { Configuration } from './Configuration';
+import { StoreContext } from '@/store/context';
+import { useContext } from 'react';
 
 export function ScheduledExperiences() {
+    const [store, setStore] = useContext(StoreContext);
     const [opened, { open, close, toggle }] = useDisclosure(false);
-    const elements = [
-        { date: '27/3/24', level: '74', participant2: 'itay45977@gmail.com', participant1: 'ohad@gmail.com', createdBy: 'Michal Rinott' },
-        { date: '30/3/24', level: '69', participant2: 'nikol@gmail.com', participant1: 'noam@gmail.com', createdBy: 'Michal Rinott' },
-        { date: '31/3/24', level: '40', participant2: 'ilan@gmail.com', participant1: 'jecki@gmail.com', createdBy: 'Michal Rinott' },
-    ];
 
-    const rows = elements.map((element) => (
+    const rows = store.scheduled.map((element) => (
         <Table.Tr flex="col" key={element.createdBy}>
             <Table.Td>{element.createdBy}</Table.Td>
             <Table.Td>{element.participant1}</Table.Td>

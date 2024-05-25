@@ -1,33 +1,24 @@
 'use client';
 
-import { ActionIcon, Card, Flex, Group, Input, Select, Table, Text, Title } from '@mantine/core';
+import React, { useContext } from 'react';
+import {
+  ActionIcon,
+  Card,
+  Flex,
+  Input,
+  Select,
+  Table,
+  Title,
+} from '@mantine/core';
 import { IconPencil, IconSearch, IconTrash } from '@tabler/icons-react';
+import { StoreContext } from '@/store/context';
 import { EditExperience } from './EditExperience';
 
 export function ExperiencesTable() {
-  const elements = [
-    {
-      date: '27/3/24',
-      level: '74',
-      participant2: 'itay45977@gmail.com',
-      participant1: 'ohad@gmail.com',
-    },
-    {
-      date: '30/3/24',
-      level: '69',
-      participant2: 'nikol@gmail.com',
-      participant1: 'noam@gmail.com',
-    },
-    {
-      date: '31/3/24',
-      level: '40',
-      participant2: 'ilan@gmail.com',
-      participant1: 'jecki@gmail.com',
-    },
-  ];
+  const [store, setStore] = useContext(StoreContext);
 
-  const rows = elements.map((element) => (
-    <Table.Tr flex="col" key={element.participant1}>
+  const rows = store.experiences.map((element) => (
+    <Table.Tr key={element.participant1}>
       <Table.Td>{element.participant1}</Table.Td>
       <Table.Td>{element.participant2}</Table.Td>
       <Table.Td>{element.level}</Table.Td>
@@ -44,6 +35,7 @@ export function ExperiencesTable() {
       </Table.Td>
     </Table.Tr>
   ));
+
   return (
     <Flex direction="column" w="100%">
       <Flex align="flex-end">
@@ -66,8 +58,10 @@ export function ExperiencesTable() {
         </Input.Wrapper>
       </Flex>
       <Card mt={16} shadow="xs">
-        <Title size="16px">Sessions</Title>
-        <Table>
+        <Flex justify="space-between" align="center">
+          <Title size="16px">Sessions</Title>
+        </Flex>
+        <Table mt={20}>
           <Table.Thead>
             <Table.Tr>
               <Table.Th>Participant 1</Table.Th>
