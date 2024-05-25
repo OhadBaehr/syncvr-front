@@ -84,13 +84,13 @@ const initialState: IContext = {
         { date: '27.3.24', participant2: 'itay45977@gmail.com', participant1: 'ohad@gmail.com', createdBy: 'Michal Rinott' },
         { date: '30.3.24', participant2: 'nikol@gmail.com', participant1: 'noam@gmail.com', createdBy: 'Michal Rinott' },
         { date: '31.3.24', participant2: 'ilan@gmail.com', participant1: 'jecki@gmail.com', createdBy: 'Michal Rinott' },
-    ]
+    ],
 };
 
 export const StoreContext = createContext([
     initialState,
-    (() => {}) as Dispatch<SetStateAction<IContext>>,
-]);
+    (() => { }),
+] as [IContext, Dispatch<SetStateAction<IContext>>]);
 
 export function StoreContextProvider({ children }: { children: ReactNode }) {
     const [store, setStore] = useState(initialState);
