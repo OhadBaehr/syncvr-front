@@ -43,7 +43,7 @@ export function ExperiencesTable() {
     </Table.Tr>
   ));
   return (
-    <>
+    <Flex direction={'column'}w={'100%'}>
       <Flex align={'flex-end'}>
         <Input.Wrapper label={'7/221 Displayed'}>
           <Input
@@ -80,6 +80,6 @@ export function ExperiencesTable() {
         </Table>
       </Card>
       <EditExperience></EditExperience>
-    </>
+    </Flex>
   );
 }

@@ -73,111 +73,113 @@ export function EditExperience() {
       <Title mt={10} mb={20} size="20px">
         Ohad Beahr & Itay Aharoni - 27/3/24
       </Title>
-      <Flex direction={'column'}>
-        <Card w="70%" mr={5} mb={20}>
-          <Title size="16px" order={2}>
-            Synchronization Over Time
-          </Title>
-          <Flex align="center" mb={10}>
-            <Input.Wrapper ml="auto" label="Mode">
-              <Select
-                data={selectOptions}
-                value={mode}
-                onChange={(value) => handleModeChange(value)}
-              />
-            </Input.Wrapper>
-            <Input.Wrapper ml={10} label="Synchronization Algorithm">
-              <Select
-                data={algoOptions}
-                value={syncAlgo}
-                onChange={(value) => handleSyncAlgoChange(value)}
-              />
-            </Input.Wrapper>
-          </Flex>
-          <ResponsiveContainer width="100%" height={400}>
-            <AreaChart data={sampleData} margin={{ top: 20, right: 30, left: 40, bottom: 20 }}>
-              <CartesianGrid strokeDasharray="3 3" />
+      <Flex wrap={'wrap'} w={'100%'}>
+        <Flex direction={'column'}>
+          <Card mr={5} mb={20}>
+            <Title size="16px" order={2}>
+              Synchronization Over Time
+            </Title>
+            <Flex align="center" mb={10}>
+              <Input.Wrapper ml="auto" label="Mode">
+                <Select
+                  data={selectOptions}
+                  value={mode}
+                  onChange={(value) => handleModeChange(value)}
+                />
+              </Input.Wrapper>
+              <Input.Wrapper ml={10} label="Synchronization Algorithm">
+                <Select
+                  data={algoOptions}
+                  value={syncAlgo}
+                  onChange={(value) => handleSyncAlgoChange(value)}
+                />
+              </Input.Wrapper>
+            </Flex>
+            <ResponsiveContainer width="100%" height={400}>
+              <AreaChart data={sampleData} margin={{ top: 20, right: 30, left: 40, bottom: 20 }}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis
+                  dataKey="time"
+                  interval={0}
+                  label={{
+                    value: 'Time',
+                    position: 'insideBottom',
+                    offset: -10,
+                    dy: 10,
+                    style: { textAnchor: 'middle' },
+                  }}
+                />
+                <YAxis
+                  domain={[0, 100]}
+                  ticks={[0, 20, 40, 60, 80, 100]}
+                  label={{
+                    value: 'Level of synchronization',
+                    angle: -90,
+                    position: 'insideLeft',
+                    dx: -30,
+                    style: { textAnchor: 'middle' },
+                  }}
+                />
+                <Tooltip />
+                <Area type="monotone" dataKey="value" stroke="#8884d8" fill="#8884d8" />
+              </AreaChart>
+            </ResponsiveContainer>
+          </Card>
+          <Card>
+            <BarChart
+              h={400}
+              data={barChartData}
+              xAxisLabel="Question"
+              yAxisLabel="Score"
+              withLegend
+              legendProps={{ verticalAlign: 'bottom' }}
+              series={[
+                { name: 'Itay', color: 'violet.6' },
+                { name: 'Ohad', color: 'blue.6' },
+              ]}
+              dataKey={'question'}
+            >
               <XAxis
-                dataKey="time"
-                interval={0}
+                dataKey="question"
                 label={{
-                  value: 'Time',
+                  value: 'Question',
                   position: 'insideBottom',
                   offset: -10,
                   dy: 10,
                   style: { textAnchor: 'middle' },
                 }}
+                tickFormatter={(value) => `q${value.slice(1)}`}
               />
               <YAxis
-                domain={[0, 100]}
-                ticks={[0, 20, 40, 60, 80, 100]}
+                ticks={yAxisTicks}
                 label={{
-                  value: 'Level of synchronization',
+                  value: 'Score',
                   angle: -90,
                   position: 'insideLeft',
                   dx: -30,
                   style: { textAnchor: 'middle' },
                 }}
               />
-              <Tooltip />
-              <Area type="monotone" dataKey="value" stroke="#8884d8" fill="#8884d8" />
-            </AreaChart>
-          </ResponsiveContainer>
-        </Card>
-        <Card w="70%">
-          <BarChart
-            h={400}
-            data={barChartData}
-            xAxisLabel="Question"
-            yAxisLabel="Score"
-            withLegend
-            legendProps={{ verticalAlign: 'bottom' }}
-            series={[
-              { name: 'Itay', color: 'violet.6' },
-              { name: 'Ohad', color: 'blue.6' },
-            ]}
-            dataKey={'question'}
-          >
-            <XAxis
-              dataKey="question"
-              label={{
-                value: 'Question',
-                position: 'insideBottom',
-                offset: -10,
-                dy: 10,
-                style: { textAnchor: 'middle' },
-              }}
-              tickFormatter={(value) => `q${value.slice(1)}`}
-            />
-            <YAxis
-              ticks={yAxisTicks}
-              label={{
-                value: 'Score',
-                angle: -90,
-                position: 'insideLeft',
-                dx: -30,
-                style: { textAnchor: 'middle' },
-              }}
-            />
-          </BarChart>
+            </BarChart>
+          </Card>
+        </Flex>
+        <Card>
+          <Flex justify="space-between" align="center" style={{ marginBottom: '10px' }}>
+            <Title size="16px" order={2}>
+              Notes
+            </Title>
+            <Button variant="transparent" color="gray" style={{ marginRight: 0, fontSize: '12px' }}>
+              View All Notes
+            </Button>
+          </Flex>
+          <Note />
+          <Note />
+          <Note />
+          <Flex justify="center">
+            <Button w="90%">Add Note</Button>
+          </Flex>
         </Card>
       </Flex>
-      <Card w="30%">
-        <Flex justify="space-between" align="center" style={{ marginBottom: '10px' }}>
-          <Title size="16px" order={2}>
-            Notes
-          </Title>
-          <Button variant="transparent" color="gray" style={{ marginRight: 0, fontSize: '12px' }}>
-            View All Notes
-          </Button>
-        </Flex>
-        <Note />
-        <Note />
-        <Note />
-        <Flex justify="center">
-          <Button w="90%">Add Note</Button>
-        </Flex>
-      </Card>
     </>
   );
 }
