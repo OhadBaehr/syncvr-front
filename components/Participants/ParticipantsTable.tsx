@@ -1,5 +1,5 @@
 import React, { useContext, useState } from 'react';
-import { ActionIcon, Card, Flex, Input, Select, Table, Button, Title, Modal } from '@mantine/core';
+import { ActionIcon, Card, Flex, Input, Select, Table, Button, Title } from '@mantine/core';
 import { IconPencil, IconSearch, IconTrash } from '@tabler/icons-react';
 import { StoreContext } from '@/store/context';
 import { useDisclosure } from '@mantine/hooks';
@@ -8,38 +8,71 @@ import { NewParticipant } from './NewParticipant';
 export function ParticipantsTable() {
   const [store, setStore] = useContext(StoreContext);
   const [opened, { open, close, toggle }] = useDisclosure(false);
-
-  const [isNewParticipantModalOpen, setIsNewParticipantModalOpen] = useState(false); 
-
-  const addParticipant = () => {
-    setIsNewParticipantModalOpen(true); 
-  };
+  const [editParticipant, setEditParticipant] = useState(null);
 
   const handleCreateParticipant = (participant) => {
     const newParticipant = {
       ...participant,
-      lastExperience: '-',
+      lastExperience: editParticipant ? editParticipant.lastExperience : '-',
     };
-    setStore((prevState) => ({
-      ...prevState,
-      participants: [...prevState.participants, newParticipant],
-    }));
-    setIsNewParticipantModalOpen(false);
+
+    if (editParticipant) {
+      // Update existing participant
+      setStore((prevState) => {
+        const updatedStore = {
+          ...prevState,
+          participants: prevState.participants.map(p =>
+            p.email === editParticipant.email ? newParticipant : p
+          ),
+        };
+        console.log('Store after update:', updatedStore);
+        return updatedStore;
+      });
+    } else {
+      // Add new participant
+      setStore((prevState) => {
+        const updatedStore = {
+          ...prevState,
+          participants: [...prevState.participants, newParticipant],
+        };
+        console.log('Store after add:', updatedStore);
+        return updatedStore;
+      });
+    }
+
+    close();
+    setEditParticipant(null);
+  };
+
+  const handleEditClick = (participant) => {
+    setEditParticipant(participant);
+    open();
+  };
+
+  const handleDeleteClick = (email) => {
+    setStore((prevState) => {
+      const updatedStore = {
+        ...prevState,
+        participants: prevState.participants.filter(p => p.email !== email),
+      };
+      console.log('Store after delete:', updatedStore);
+      return updatedStore;
+    });
   };
 
   const rows = store.participants.map((element) => (
-    <Table.Tr key={element.name}>
+    <Table.Tr key={element.email}>
       <Table.Td>{element.name}</Table.Td>
       <Table.Td>{element.email}</Table.Td>
       <Table.Td>{element.sex}</Table.Td>
       <Table.Td>{element.lastExperience}</Table.Td>
       <Table.Td>
-        <ActionIcon variant="subtle">
+        <ActionIcon variant="subtle" onClick={() => handleEditClick(element)}>
           <IconPencil color="blue" />
         </ActionIcon>
       </Table.Td>
       <Table.Td>
-        <ActionIcon variant="subtle">
+        <ActionIcon variant="subtle" onClick={() => handleDeleteClick(element.email)}>
           <IconTrash color="red" />
         </ActionIcon>
       </Table.Td>
@@ -89,6 +122,7 @@ export function ParticipantsTable() {
       <NewParticipant
         disclosure={[opened, { open, close, toggle }]}
         onCreateParticipant={handleCreateParticipant}
+        initialValues={editParticipant} // Pass initial values if editing
       />
     </>
   );
