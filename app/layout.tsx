@@ -7,8 +7,8 @@ import { theme } from '../theme';
 import { StoreContext, StoreContextProvider } from '@/store/context';
 
 export const metadata = {
-  title: 'Mantine Next.js template',
-  description: 'I am using Mantine with Next.js!',
+  title: 'SyncVR',
+  description: 'SyncVR Dashboard',
 };
 
 export default function RootLayout({ children }: { children: any }) {

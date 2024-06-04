@@ -1,14 +1,21 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Modal, TextInput, Select, Button, Divider, Flex } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { Column } from '../Layout/Column';
 
-export function NewParticipant({ disclosure, onCreateParticipant }: { disclosure: ReturnType<typeof useDisclosure>, onCreateParticipant: (participant: Participant) => void;}) {
+export function NewParticipant({ disclosure, onCreateParticipant, initialValues }) {
   const [opened, { close }] = disclosure;
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [sex, setSex] = useState('');
   const [error, setError] = useState('');
+
+  useEffect(() => {
+    if (initialValues) {
+      setName(initialValues.name);
+      setEmail(initialValues.email);
+      setSex(initialValues.sex);
+    }
+  }, [initialValues]);
 
   const handleCreateParticipant = () => {
     if (!name || !email || !sex) {
@@ -21,8 +28,7 @@ export function NewParticipant({ disclosure, onCreateParticipant }: { disclosure
       email,
       sex,
     };
-    onCreateParticipant(newParticipant); 
-    close();
+    onCreateParticipant(newParticipant);
     setName('');
     setEmail('');
     setSex('');
@@ -74,7 +80,9 @@ export function NewParticipant({ disclosure, onCreateParticipant }: { disclosure
           </Flex>
         )}
         <Flex justify="center" mt={25}>
-          <Button onClick={handleCreateParticipant}>Create Participant</Button>
+          <Button onClick={handleCreateParticipant}>
+            {initialValues ? 'Update Participant' : 'Create Participant'}
+          </Button>
         </Flex>
       </Flex>
     </Modal>
