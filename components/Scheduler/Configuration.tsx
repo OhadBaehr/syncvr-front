@@ -22,41 +22,44 @@ import { IconClock } from '@tabler/icons-react';
 import { useDisclosure } from '@mantine/hooks';
 import { Row } from '../Layout/Row';
 import { Column } from '../Layout/Column';
+import useSWR from 'swr';
+import axios from 'axios';
 
 export function Configuration({ disclosure }: { disclosure: ReturnType<typeof useDisclosure> }) {
   const [opened, { close }] = disclosure;
-  const participants = ['Itay', 'Ohad', 'Moran'];
+  // const { data: participants, error } = useSWR('/api/auth0-users', url => axios.get(url).then(res => res.data));
 
-  const [selectedParticipants, setSelectedParticipants] = useState([]);
-  const [duration, setDuration] = useState('120');
-  const [highSync, sethighSync] = useState(70);
-  const [lowSync, setlowSync] = useState(40);
-  const [dates, setDates] = useState<Date[]>([]);
+  // console.log(participants)
+  // const [selectedParticipants, setSelectedParticipants] = useState([]);
+  // const [duration, setDuration] = useState('120');
+  // const [highSync, sethighSync] = useState(70);
+  // const [lowSync, setlowSync] = useState(40);
+  // const [dates, setDates] = useState<Date[]>([]);
 
-  const handleSelect = (value) => {
-    if (selectedParticipants.length < 2) {
-      setSelectedParticipants(value);
-    }
-  };
+  // const handleSelect = (value) => {
+  //   if (selectedParticipants.length < 2) {
+  //     setSelectedParticipants(value);
+  //   }
+  // };
 
-  const handleDurationChange = (value) => {
-    setDuration(value);
-  };
+  // const handleDurationChange = (value) => {
+  //   setDuration(value);
+  // };
 
-  const handleHighSync = (value) => {
-    sethighSync(value);
-  };
+  // const handleHighSync = (value) => {
+  //   sethighSync(value);
+  // };
 
-  const handleLowSync = (value) => {
-    setlowSync(value);
-  };
+  // const handleLowSync = (value) => {
+  //   setlowSync(value);
+  // };
 
-  const middleRangeStart = Math.min(highSync, lowSync) + 1;
-  const middleRangeEnd = Math.max(highSync, lowSync) - 1;
+  // const middleRangeStart = Math.min(highSync, lowSync) + 1;
+  // const middleRangeEnd = Math.max(highSync, lowSync) - 1;
 
   return (
     <Modal title="Experience Configuration" size="lg" onClose={close} opened={opened}>
-      <Divider mb={10} />
+      {/* <Divider mb={10} />
       <Row gap={36}>
         <Column gap={16}>
           <MultiSelect
@@ -206,7 +209,7 @@ export function Configuration({ disclosure }: { disclosure: ReturnType<typeof us
           />
           <Button>Create Experienece</Button>
         </Column>
-      </Row>
+      </Row> */}
 
     </Modal>
 

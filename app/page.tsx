@@ -1,9 +1,8 @@
-import { SignIn } from "@/components/SignIn/SignIn";
+import Participants from "./participants/page";
+import Scheduler from "./Scheduler/page";
 
 export default function HomePage() {
   return (
-    <>
-      <SignIn/>
-    </>
+    <Participants />
   );
 }

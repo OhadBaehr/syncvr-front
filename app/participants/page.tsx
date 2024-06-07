@@ -1,4 +1,5 @@
 'use client'
+import { useUser } from '@auth0/nextjs-auth0/client';
 import { ExperiencesTable } from "@/components/Experiences/ExperiencesTable";
 import { ParticipantsTable } from "@/components/Participants/ParticipantsTable";
 import { ScheduledExperiences } from "@/components/Scheduler/ScheduledExperiences";
@@ -9,16 +10,18 @@ import { capitalize } from "lodash";
 import Image from "next/image";
 import { useState } from "react";
 enum TabsValues {
-    Scheduler = "scheduler",    
+    Scheduler = "scheduler",
     Participants = "participants",
     Experiences = "experiences",
 
 }
 export default function Participants() {
     const [opened, { toggle }] = useDisclosure();
+    const { user, error, isLoading } = useUser();
+    console.log(user)
     const [currentValue, setCurrentValue] = useState(TabsValues.Participants);
     return (
-        <Tabs onChange={(value)=>setCurrentValue(value as TabsValues)} variant="pills" defaultValue={TabsValues.Participants} orientation="vertical">
+        <Tabs onChange={(value) => setCurrentValue(value as TabsValues)} variant="pills" defaultValue={TabsValues.Participants} orientation="vertical">
             <AppShell
                 w={'100%'}
                 navbar={{
@@ -43,11 +46,11 @@ export default function Participants() {
                 </AppShell.Navbar>
 
                 <AppShell.Main style={{ background: "#F4F7FE" }}>
-                    
+
                     <Flex align={'center'} >
-                    <Title size={'20px'}>
-                        {capitalize(currentValue)}
-                    </Title>
+                        <Title size={'20px'}>
+                            {capitalize(currentValue)}
+                        </Title>
 
                         <Card style={{ borderRadius: 300 }} p={"6px 16px"} ml={'auto'} shadow="xs">
                             <Flex gap={8} align={'center'} justify={'center'}>
@@ -67,7 +70,7 @@ export default function Participants() {
                         <ParticipantsTable />
                     </Tabs.Panel>
                     <Tabs.Panel mt={36} value={TabsValues.Experiences}>
-                        <ExperiencesTable/>
+                        <ExperiencesTable />
                     </Tabs.Panel>
                 </AppShell.Main>
             </AppShell>
