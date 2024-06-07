@@ -8,8 +8,8 @@ import { StoreContext, StoreContextProvider } from '@/store/context';
 import { UserProvider } from '@auth0/nextjs-auth0/client';
 
 export const metadata = {
-  title: 'Mantine Next.js template',
-  description: 'I am using Mantine with Next.js!',
+  title: 'SyncVR',
+  description: 'SyncVR Dashboard',
 };
 
 export default function RootLayout({ children }: { children: any }) {
