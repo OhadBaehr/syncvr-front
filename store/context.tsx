@@ -1,38 +1,7 @@
 'use client';
 
+import { Participant, Experience, SyncLevel, Form, ScheduledExperience } from '@/types';
 import { createContext, ReactNode, useState, Dispatch, SetStateAction } from 'react';
-
-interface Participant {
-    name: string;
-    email: string;
-    sex: string;
-    lastExperience: string;
-}
-
-interface Experience {
-    participant1: string;
-    participant2: string;
-    date: string;
-    level: number;
-}
-
-interface SyncLevel {
-    time: string;
-    level: number;
-}
-
-interface Form {
-    question: string;
-    answer1: number;
-    answer2: number;
-}
-
-interface ScheduledExperience {
-    createdBy: string;
-    date: string;
-    participant1: string;
-    participant2: string;
-}
 
 interface IContext {
     participants: Participant[];
@@ -43,16 +12,8 @@ interface IContext {
 }
 
 const initialState: IContext = {
-    participants: [
-        { lastExperience: '27.3.24', sex: 'male', email: 'itay45977@gmail.com', name: 'Itay Aharoni' },
-        { lastExperience: '27.3.24', sex: 'male', email: 'ohad@gmail.com', name: 'Ohad Baehr' },
-        { lastExperience: '27.3.24', sex: 'male', email: 'moran@gmail.com', name: 'Moran Amar' },
-    ],
-    experiences: [
-        { date: '27.3.24', level: 74, participant1: 'ohad@gmail.com', participant2: 'itay45977@gmail.com' },
-        { date: '30.3.24', level: 69, participant1: 'noam@gmail.com', participant2: 'nikol@gmail.com' },
-        { date: '31.3.24', level: 40, participant1: 'jecki@gmail.com', participant2: 'ilan@gmail.com' },
-    ],
+    participants: [],
+    experiences: [],
     synclevel: [
         { time: '0s', level: 0 },
         { time: '10s', level: 10 },
@@ -80,11 +41,7 @@ const initialState: IContext = {
         { question: 'q9', answer1: 5, answer2: 5 },
         { question: 'q10', answer1: 3, answer2: 5 },
     ],
-    scheduled: [
-        { date: '27.3.24', participant2: 'itay45977@gmail.com', participant1: 'ohad@gmail.com', createdBy: 'Michal Rinott' },
-        { date: '30.3.24', participant2: 'nikol@gmail.com', participant1: 'noam@gmail.com', createdBy: 'Michal Rinott' },
-        { date: '31.3.24', participant2: 'ilan@gmail.com', participant1: 'jecki@gmail.com', createdBy: 'Michal Rinott' },
-    ],
+    scheduled: [],
 };
 
 export const StoreContext = createContext([

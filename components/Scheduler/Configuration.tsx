@@ -1,12 +1,8 @@
-import React, { useState } from 'react';
+import React, { useContext, useRef, useState } from 'react';
 import {
-  Card,
   Flex,
-  Title,
   Divider,
-  Grid,
   MultiSelect,
-  Radio,
   Checkbox,
   Group,
   NumberInput,
@@ -15,113 +11,209 @@ import {
   rem,
   Button,
   Modal,
+  ColorPicker,
+  Box,
+  Menu,
+  SegmentedControl,
+  Slider,
+  InputDescription,
+  Input,
+  Badge,
 } from '@mantine/core';
 import { DatePicker, TimeInput } from '@mantine/dates';
-import dayjs from 'dayjs';
 import { IconClock } from '@tabler/icons-react';
 import { useDisclosure } from '@mantine/hooks';
 import { Row } from '../Layout/Row';
 import { Column } from '../Layout/Column';
-import useSWR from 'swr';
 import axios from 'axios';
+import { StoreContext } from '@/store/context';
+import { showNotification } from '@mantine/notifications';
+import { useUser } from '@auth0/nextjs-auth0/client';
+import { create } from 'lodash';
+import { Participant, ScheduledExperience } from '@/types';
 
-export function Configuration({ disclosure }: { disclosure: ReturnType<typeof useDisclosure> }) {
+import { v4 as uuid } from 'uuid';
+import { ExperienceType } from '@/constants';
+
+function Swatch({ color = '#2e2e2e', setColor }: { color: string; setColor: (color: string) => void }) {
+  return (
+    <Menu>
+      <Menu.Target>
+        <Box style={{ width: 24, height: 24, background: color, borderRadius: 300, border: "1px solid rgba(70,70,70, 0.3)", cursor: 'pointer' }}>
+        </Box>
+      </Menu.Target>
+      <Menu.Dropdown>
+        <ColorPicker value={color} onChange={setColor} format="rgb" swatches={['#2e2e2e', '#868e96', '#fa5252', '#e64980', '#be4bdb', '#7950f2', '#4c6ef5', '#228be6', '#15aabf', '#12b886', '#40c057', '#82c91e', '#fab005', '#fd7e14']} />
+      </Menu.Dropdown>
+    </Menu>
+  );
+}
+
+
+interface ConfigurationProps {
+  loading: boolean
+  disclosure: ReturnType<typeof useDisclosure>
+  onCreateSchedule: (schedule: ScheduledExperience) => void
+  initialValues: ScheduledExperience | undefined
+}
+
+export function Configuration({ loading, onCreateSchedule, initialValues, disclosure }: ConfigurationProps) {
   const [opened, { close }] = disclosure;
-  // const { data: participants, error } = useSWR('/api/auth0-users', url => axios.get(url).then(res => res.data));
+  const [{ participants }] = useContext(StoreContext);
+  const { user } = useUser()
+  const [selectedParticipants, setSelectedParticipants] = useState<Participant[]>(initialValues?.selectedParticipants ?? []);
+  const [phaseDurationStr, setPhaseDurationStr] = useState(initialValues?.phaseDuration ? initialValues.phaseDuration.toString() + 's' : '60s');
+  const [historyLength, setHistoryLength] = useState(initialValues?.historyLength ?? 15);
+  const [rateOfTesting, setRateOfTesting] = useState(initialValues?.rateOfTesting ?? 150);
+  const [highSyncColor, setHighSyncColor] = useState(initialValues?.highSyncColor ?? 'rgb(93, 190, 232)');
+  const [midSyncColor, setMidSyncColor] = useState(initialValues?.midSyncColor ?? 'rgba(224, 175, 52)');
+  const [lowSyncColor, setLowSyncColor] = useState(initialValues?.lowSyncColor ?? 'rgba(227, 52, 52)');
+  const [time, setTime] = useState(initialValues?.date ? new Date((initialValues.date)).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true }) : '00:00');
 
-  // console.log(participants)
-  // const [selectedParticipants, setSelectedParticipants] = useState([]);
-  // const [duration, setDuration] = useState('120');
-  // const [highSync, sethighSync] = useState(70);
-  // const [lowSync, setlowSync] = useState(40);
-  // const [dates, setDates] = useState<Date[]>([]);
+  const [highSync, setHighSync] = useState(initialValues?.highSync ?? 70);
+  const [lowSync, setLowSync] = useState(initialValues?.lowSync ?? 40);
+  const [date, setDate] = useState<Date | null>(initialValues?.date ?? null);
+  const [experienceType, setExperienceType] = useState<string[]>(initialValues?.experienceType ?? ['hands']);
+  const [pendulumRotationStr, setPendulumRotationStr] = useState(initialValues?.pendulumRotation? initialValues.pendulumRotation.toString() + 'deg' : '180deg');
 
-  // const handleSelect = (value) => {
-  //   if (selectedParticipants.length < 2) {
-  //     setSelectedParticipants(value);
-  //   }
-  // };
+  const hourRef = useRef<HTMLInputElement>(null);
 
-  // const handleDurationChange = (value) => {
-  //   setDuration(value);
-  // };
+  const handleSelect = (value: string[]) => {
+    setSelectedParticipants(value.map((email) => participants.find((participant) => participant.email === email)!));
+  };
 
-  // const handleHighSync = (value) => {
-  //   sethighSync(value);
-  // };
+  const handlePhaseDurationChange = (value: string) => {
+    setPhaseDurationStr(value);
+  };
 
-  // const handleLowSync = (value) => {
-  //   setlowSync(value);
-  // };
+  const handleHistoryLengthChange = (value: number) => {
+    setHistoryLength(value);
+  };
 
-  // const middleRangeStart = Math.min(highSync, lowSync) + 1;
-  // const middleRangeEnd = Math.max(highSync, lowSync) - 1;
+  const handleRateOfTestingChange = (value: string | number) => {
+    setRateOfTesting(Number(value));
+  };
+
+  const handleHighSync = (value: number | string) => {
+    setHighSync(Number(value));
+  };
+
+  const handleLowSync = (value: number | string) => {
+    setLowSync(Number(value));
+  };
+
+  const handleExperienceTypeChange = (value: string[]) => {
+    setExperienceType(value);
+  };
+
+  const handlePendulumRotationChange = (value: string) => {
+    setPendulumRotationStr(value);
+  };
+
+  const pickerControl = (
+    <ActionIcon variant="subtle" color="gray" onClick={() => hourRef.current?.showPicker()}>
+      <IconClock style={{ width: rem(16), height: rem(16) }} />
+    </ActionIcon>
+  );
+
+  const handleSubmit = () => {
+    if (!user) return
+
+    if (selectedParticipants.length !== 2) {
+      showNotification({ message: 'Please select exactly 2 participants.', color: 'red' });
+      return;
+    }
+
+    if (!date) {
+      showNotification({ message: 'Please select a date and time.', color: 'red' });
+      return;
+    }
+
+    if (!experienceType.length) {
+      showNotification({ message: 'Please select at least one experience type.', color: 'red' });
+      return;
+    }
+
+    // Extract the time from hourRef
+    const timeValue = hourRef.current?.value;
+    if (!timeValue) {
+      showNotification({ message: 'Please select a time.', color: 'red' });
+      return;
+    }
+
+    // Combine date and time
+    const [hours, minutes] = timeValue.split(':').map(Number);
+    const combinedDate = new Date(date);
+    combinedDate.setHours(hours);
+    combinedDate.setMinutes(minutes);
+
+    const experienceData = {
+      uniqueId: uuid(),
+      createdByEmail: user.email as string,
+      createdBy: user.name as string,
+      selectedParticipants,
+      phaseDuration: Number(phaseDurationStr.split('s')[0]),
+      historyLength,
+      rateOfTesting,
+      highSync,
+      lowSync,
+      date: combinedDate,
+      experienceType: experienceType as ExperienceType[],
+      pendulumRotation: Number(pendulumRotationStr.split('deg')[0]),
+      highSyncColor,
+      midSyncColor,
+      lowSyncColor,
+    };
+
+    onCreateSchedule(experienceData)
+  };
 
   return (
     <Modal title="Experience Configuration" size="lg" onClose={close} opened={opened}>
-      {/* <Divider mb={10} />
+      <Divider mb={10} />
       <Row gap={36}>
         <Column gap={16}>
           <MultiSelect
+            required
+            description="Select 2 participants for the experience"
             label="Participants"
-            data={participants}
+            data={participants.map((participant) => ({ value: participant.email, label: participant.name }))}
             placeholder="Select 2 participants"
             searchable
-            value={selectedParticipants}
+            value={selectedParticipants.map((participant) => participant.email)}
             onChange={handleSelect}
             nothingFoundMessage="Nothing found..."
             maxValues={2}
             hidePickedOptions
             mb={12}
           />
-          <Radio.Group
-            mb={12}
-            value={duration}
-            onChange={setDuration}
-            name="favoriteFramework"
-            label="Select experience's duration"
-            withAsterisk
-          >
-            <Radio mt={5} value="30" label="30s" />
-            <Radio mt={5} value="60" label="60s" />
-            <Radio mt={5} value="90" label="90s" />
-            <Radio mt={5} value="120" label="120s" />
-          </Radio.Group>
-          <Checkbox.Group
-            mb={12}
-            defaultValue={['Hands']}
-            label="Select experience's type"
-            description="You can select 2 options"
-            withAsterisk
-          >
-            <Group>
-              <Checkbox mt={5} value="hands" label="Hands movement" />
-              <Checkbox value="pandulum" label="Pendulum" />
-            </Group>
-          </Checkbox.Group>
-          <div>
+          <Input.Wrapper label={'Phase duration'} description={'How long each phase (Hands, Pendulum) will last'}>
+            <SegmentedControl mt={6} data={['30s', '45s', '60s', '75s', '90s']} value={phaseDurationStr} onChange={handlePhaseDurationChange} />
+
+          </Input.Wrapper>
+          <Column mt={'auto'} gap={2}>
+            <Text size="sm" fw={500}>
+              History length
+            </Text>
+            <InputDescription>How many data points the calculation has</InputDescription>
+            <Row gap={8} align={'center'}>
+              <Slider w={'100%'} value={historyLength} onChange={handleHistoryLengthChange} min={5} max={25} />
+              <Badge w={40}>{historyLength}</Badge>
+            </Row>
+          </Column>
+          <Column gap={2}>
+            <Input.Wrapper label={"Rate of testing"} description={'How often synchronization is being analyzed'}>
+              <NumberInput mt={2} min={100} max={300} value={rateOfTesting} onChange={handleRateOfTestingChange} suffix='ms' />
+            </Input.Wrapper>
+          </Column>
+          <Column w={280}>
             <Text size="sm" fw={500} mb={5} mt={10}>
               Thresholds
             </Text>
-
-            <Flex align="center" justify="space-between" mb={10}>
+            <InputDescription>Color and range of synchronization levels</InputDescription>
+            <Flex mt={8} align="center" justify="space-between" mb={10}>
               <Flex align="center">
-                <ActionIcon
-                  size="lg"
-                  loading
-                  variant="outline"
-                  loaderProps={{
-                    type: 'dots',
-                    color: 'green',
-                    size: 'md',
-                  }}
-                  styles={() => ({
-                    root: {
-                      borderColor: 'transparent',
-                      backgroundColor: 'transparent',
-                    },
-                  })}
-                />
+                <Swatch color={highSyncColor} setColor={setHighSyncColor} />
                 <Text style={{ whiteSpace: 'nowrap' }} ml={10} size="sm" fw={500}>
                   High Synchronization
                 </Text>
@@ -129,58 +221,28 @@ export function Configuration({ disclosure }: { disclosure: ReturnType<typeof us
               <NumberInput
                 value={highSync}
                 onChange={handleHighSync}
-                min={51}
+                min={lowSync + 1}
                 max={100}
                 styles={{ input: { width: 60 } }}
               />
             </Flex>
-
+            <Divider mb={12} />
             <Flex align="center" justify="space-between" mb={10}>
               <Flex align="center">
-                <ActionIcon
-                  size="lg"
-                  loading
-                  variant="outline"
-                  loaderProps={{
-                    type: 'dots',
-                    color: 'yellow',
-                    size: 'md',
-                  }}
-                  styles={() => ({
-                    root: {
-                      borderColor: 'transparent',
-                      backgroundColor: 'transparent',
-                    },
-                  })}
-                />
+                <Swatch color={midSyncColor} setColor={setMidSyncColor} />
                 <Text style={{ whiteSpace: 'nowrap' }} ml={10} size="sm" fw={500}>
                   Medium Synchronization
                 </Text>
               </Flex>
               <Text style={{ whiteSpace: 'nowrap' }} ml={8} mr={13} size="sm" fw={500}>
-                {middleRangeStart} - {middleRangeEnd}
+                {lowSync} - {highSync}
               </Text>
             </Flex>
-
+            <Divider mb={12} />
             <Flex align="center" justify="space-between" mb={10}>
               <Flex align="center">
-                <ActionIcon
-                  size="lg"
-                  loading
-                  variant="outline"
-                  loaderProps={{
-                    type: 'dots',
-                    color: 'red',
-                    size: 'md',
-                  }}
-                  styles={() => ({
-                    root: {
-                      borderColor: 'transparent',
-                      backgroundColor: 'transparent',
-                    },
-                  })}
-                />
-                <Text style={{ whiteSpace: 'nowrap' }} ml={10} size="sm" fw={500}>
+                <Swatch color={lowSyncColor} setColor={setLowSyncColor} />
+                <Text style={{ whiteSpace: 'nowrap', textAlign: 'right' }} ml={10} size="sm" fw={500}>
                   Low Synchronization
                 </Text>
               </Flex>
@@ -188,30 +250,61 @@ export function Configuration({ disclosure }: { disclosure: ReturnType<typeof us
                 value={lowSync}
                 onChange={handleLowSync}
                 min={0}
-                max={50}
+                max={highSync - 1}
                 styles={{ input: { width: 60 } }}
               />
             </Flex>
-          </div>
+          </Column>
         </Column>
-        <Column w="100%">
-          <DatePicker
-            //   style={{ width: '100%' }}
-            firstDayOfWeek={0}
-            type="multiple"
-            value={dates}
-            onChange={setDates}
-          />
-          <TimeInput
-            mt="auto"
-            label="Select Time"
-          //leftSection={<IconClock style={{ width: rem(16), height: rem(16) }} stroke={1.5} />}
-          />
-          <Button>Create Experienece</Button>
+        <Column w="100%" gap={16}>
+          <Checkbox.Group
+            mb={12}
+            defaultValue={['hands']}
+            label="Select experience's type"
+            description="You can select 2 options"
+            withAsterisk
+            value={experienceType}
+            onChange={handleExperienceTypeChange}
+          >
+            <Row mt={4} align={'center'} gap={8}>
+              <Checkbox value="hands" label="Hands movement" />
+              <Checkbox value="pendulum" label="Pendulum" />
+            </Row>
+          </Checkbox.Group>
+          <Column gap={2}>
+            <Text size="sm" fw={500}>
+              Pendulum rotation
+            </Text>
+            <InputDescription>Back and forth or spinning Pendulum</InputDescription>
+            <SegmentedControl mt={2} data={['180deg', '360deg']} value={pendulumRotationStr} onChange={handlePendulumRotationChange} />
+          </Column>
+          <Column>
+            <Input.Wrapper required label={'Select Time'} description={'Experience will be available for up to 3 hours.'}>
+              <DatePicker
+                minDate={new Date()}
+                mt={4}
+                firstDayOfWeek={0}
+                value={date}
+                onChange={(date) => {
+                  setDate(date)
+                  if (date && date.toDateString() === new Date().toDateString()) {
+                    setTime(new Date().toLocaleTimeString('en-GB', { hour12: false, hour: '2-digit', minute: '2-digit' }))
+                  }
+                }}
+              />
+              <TimeInput
+                ref={hourRef}
+                value={time}
+                onChange={(e) => setTime(e.currentTarget.value)}
+                rightSection={pickerControl}
+                withSeconds={false}
+                minTime={date && date.toDateString() === new Date().toDateString() ? new Date().toLocaleTimeString('en-GB', { hour12: false, hour: '2-digit', minute: '2-digit' }) : '00:00'}
+              />
+            </Input.Wrapper>
+          </Column>
+          <Button mt={'auto'} onClick={handleSubmit}>Create Experience</Button>
         </Column>
-      </Row> */}
-
+      </Row>
     </Modal>
-
   );
 }

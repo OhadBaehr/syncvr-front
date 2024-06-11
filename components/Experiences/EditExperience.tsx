@@ -93,39 +93,39 @@ export function EditExperience() {
             </ResponsiveContainer>
           </Card>
           <Card>
-  <Title size="16px" order={2}>
-    Interpersonal Connection Forms
-  </Title>
-  <ResponsiveContainer width="100%" height={500}>
-    <BarChart data={personalForms} margin={{ bottom: 40 }}>
-      <CartesianGrid strokeDasharray="3 3" />
-      <XAxis
-        dataKey="question"
-        label={{
-          value: 'Question',
-          offset: 0,
-          position: 'insideBottom',
-          dy: 20,
-        }}
-        tickFormatter={(value) => `q${value.slice(1)}`}
-      />
-      <YAxis
-        domain={[0, 5]}
-        ticks={[0, 1, 2, 3, 4, 5]} 
-        label={{
-          value: 'Score',
-          angle: -90,
-          position: 'insideLeft',
-          style: { textAnchor: 'middle' },
-        }}
-      />
-      <Tooltip />
-      <Legend verticalAlign="top" align="right" height={36}/>
-      <Bar dataKey="answer1" fill="#8884d8" name="Itay" />
-      <Bar dataKey="answer2" fill="#82ca9d" name="Ohad" />
-    </BarChart>
-  </ResponsiveContainer>
-</Card>
+            <Title size="16px" order={2}>
+              Interpersonal Connection Forms
+            </Title>
+            <ResponsiveContainer width="100%" height={500}>
+              <BarChart data={personalForms} margin={{ bottom: 40 }}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis
+                  dataKey="question"
+                  label={{
+                    value: 'Question',
+                    offset: 0,
+                    position: 'insideBottom',
+                    dy: 20,
+                  }}
+                  tickFormatter={(value) => `q${value.slice(1)}`}
+                />
+                <YAxis
+                  domain={[0, 5]}
+                  ticks={[0, 1, 2, 3, 4, 5]}
+                  label={{
+                    value: 'Score',
+                    angle: -90,
+                    position: 'insideLeft',
+                    style: { textAnchor: 'middle' },
+                  }}
+                />
+                <Tooltip />
+                <Legend verticalAlign="top" align="right" height={36} />
+                <Bar dataKey="answer1" fill="#8884d8" name="Itay" />
+                <Bar dataKey="answer2" fill="#82ca9d" name="Ohad" />
+              </BarChart>
+            </ResponsiveContainer>
+          </Card>
 
 
 

@@ -8,18 +8,58 @@ import { useDisclosure } from "@mantine/hooks";
 import { IconDoorExit, IconEdit, IconLogout, IconPencil, IconSearch, IconTrash, IconUserEdit } from "@tabler/icons-react";
 import { capitalize } from "lodash";
 import Image from "next/image";
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
+import useSWR from 'swr';
+import axios from 'axios';
+import { StoreContext } from '@/store/context';
+import { Participant, ScheduledExperience } from '@/types';
+
 enum TabsValues {
     Scheduler = "scheduler",
     Participants = "participants",
     Experiences = "experiences",
-
 }
+
 export default function Participants() {
     const [opened, { toggle }] = useDisclosure();
     const { user, error, isLoading } = useUser();
-    console.log(user)
+    const { nickname } = user || { nickname: "" }
     const [currentValue, setCurrentValue] = useState(TabsValues.Participants);
+    const [animatedNickname, setAnimatedNickname] = useState("");
+    const [store, setStore] = useContext(StoreContext);
+    const [participantsLoading, setParticipantsLoading] = useState(true);
+
+    useSWR<Participant[]>('/api/participants', (url: string) => axios.get(url).then(res => res.data), {
+        onSuccess: (data) => {
+            setStore((prev) => ({ ...prev, participants: data }))
+            setParticipantsLoading(false);
+        }
+    });
+
+    useSWR<ScheduledExperience[]>('/api/scheduled', (url: string) => axios.get(url).then(res => res.data), {
+        onSuccess: (data) => {
+            setStore((prev) => ({ ...prev, scheduled: data }))
+            setParticipantsLoading(false);
+        }
+    });
+
+    useEffect(() => {
+        if (nickname) {
+            let index = 0;
+            const animate = () => {
+                if (index < nickname.length) {
+                    setAnimatedNickname((prev) => prev + nickname[index]);
+                    index++;
+                    setTimeout(() => {
+                        requestAnimationFrame(animate);
+                    }, 32);
+                }
+            };
+            setAnimatedNickname("");
+            requestAnimationFrame(animate);
+        }
+    }, [nickname]);
+
     return (
         <Tabs onChange={(value) => setCurrentValue(value as TabsValues)} variant="pills" defaultValue={TabsValues.Participants} orientation="vertical">
             <AppShell
@@ -46,8 +86,7 @@ export default function Participants() {
                 </AppShell.Navbar>
 
                 <AppShell.Main style={{ background: "#F4F7FE" }}>
-
-                    <Flex align={'center'} >
+                    <Flex align={'center'}>
                         <Title size={'20px'}>
                             {capitalize(currentValue)}
                         </Title>
@@ -55,11 +94,13 @@ export default function Participants() {
                         <Card style={{ borderRadius: 300 }} p={"6px 16px"} ml={'auto'} shadow="xs">
                             <Flex gap={8} align={'center'} justify={'center'}>
                                 <Text size={'14px'}>
-                                    Hello, Researcher
+                                    {`Hello, ${animatedNickname}`}
                                 </Text>
-                                <ActionIcon variant="subtle">
-                                    <IconLogout />
-                                </ActionIcon>
+                                <a href={'/api/auth/logout'}>
+                                    <ActionIcon variant="subtle">
+                                        <IconLogout />
+                                    </ActionIcon>
+                                </a>
                             </Flex>
                         </Card>
                     </Flex>
@@ -67,7 +108,7 @@ export default function Participants() {
                         <ScheduledExperiences />
                     </Tabs.Panel>
                     <Tabs.Panel mt={36} value={TabsValues.Participants}>
-                        <ParticipantsTable />
+                        <ParticipantsTable participantsLoading={participantsLoading} />
                     </Tabs.Panel>
                     <Tabs.Panel mt={36} value={TabsValues.Experiences}>
                         <ExperiencesTable />

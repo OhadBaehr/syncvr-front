@@ -1,11 +1,13 @@
 import '@mantine/core/styles.css';
 import '@mantine/dates/styles.css';
 import '@mantine/charts/styles.css';
+import '@mantine/notifications/styles.css';
 import React from 'react';
 import { MantineProvider, ColorSchemeScript } from '@mantine/core';
 import { theme } from '../theme';
 import { StoreContext, StoreContextProvider } from '@/store/context';
 import { UserProvider } from '@auth0/nextjs-auth0/client';
+import { Notifications } from '@mantine/notifications';
 
 export const metadata = {
   title: 'SyncVR',
@@ -25,8 +27,12 @@ export default function RootLayout({ children }: { children: any }) {
       </head>
       <UserProvider>
         <body>
+
           <StoreContextProvider>
-            <MantineProvider theme={theme}>{children}</MantineProvider>
+            <MantineProvider theme={theme}>
+              {children}
+              <Notifications />
+            </MantineProvider>
           </StoreContextProvider>
         </body>
       </UserProvider>
