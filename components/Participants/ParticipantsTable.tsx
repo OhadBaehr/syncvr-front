@@ -1,3 +1,4 @@
+'use client';
 import React, { useContext, useState } from 'react';
 import useSWR from 'swr';
 import axios from 'axios';
@@ -18,8 +19,8 @@ enum SortingOption {
   LastExperience = 'Last Experience',
 }
 
-export function ParticipantsTable({ participantsLoading }: { participantsLoading: boolean }) {
-  const [_, setStore] = useContext(StoreContext);
+export function ParticipantsTable() {
+  const [{ participantsLoading }, setStore] = useContext(StoreContext);
   const [opened, { open, close, toggle }] = useDisclosure(false);
   const [editParticipant, setEditParticipant] = useState<Participant | undefined>();
   const [{ participants }] = useContext(StoreContext);

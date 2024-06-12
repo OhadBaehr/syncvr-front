@@ -95,6 +95,7 @@ export async function DELETE(request: Request) {
 
 export async function POST(request: Request) {
     const {
+        sessionId,
         uniqueId,
         createdBy,
         createdByEmail,
@@ -127,6 +128,7 @@ export async function POST(request: Request) {
     try {
         const { db } = await connectToDatabase();
         const result = await db.collection('scheduled').insertOne({
+            sessionId,
             uniqueId,
             createdBy,
             createdByEmail,
@@ -156,7 +158,7 @@ export async function POST(request: Request) {
 export async function GET() {
     try {
         const { db } = await connectToDatabase();
-        const scheduled = await db.collection('scheduled').find({}).sort({ createdAt: -1 }).toArray();
+        const scheduled = await db.collection('scheduled').find({ done: false }).sort({ createdAt: -1 }).toArray();
         return NextResponse.json(scheduled, { status: 200 });
     } catch (error: any) {
         return NextResponse.json({ message: error.message }, { status: 500 });

@@ -8,6 +8,11 @@ import { theme } from '../theme';
 import { StoreContext, StoreContextProvider } from '@/store/context';
 import { UserProvider } from '@auth0/nextjs-auth0/client';
 import { Notifications } from '@mantine/notifications';
+import { Participant, ScheduledExperience } from '@/types';
+import axios from 'axios';
+import useSWR from 'swr';
+import { InitialDataProvider } from '@/components/Providers/InitialDataProvider';
+import { Dashboard } from '@/components/Templates/Dashboard';
 
 export const metadata = {
   title: 'SyncVR',
@@ -27,12 +32,15 @@ export default function RootLayout({ children }: { children: any }) {
       </head>
       <UserProvider>
         <body>
-
           <StoreContextProvider>
-            <MantineProvider theme={theme}>
-              {children}
-              <Notifications />
-            </MantineProvider>
+            <InitialDataProvider >
+              <MantineProvider theme={theme}>
+                <Dashboard>
+                  {children}
+                </Dashboard>
+                <Notifications />
+              </MantineProvider>
+            </InitialDataProvider>
           </StoreContextProvider>
         </body>
       </UserProvider>

@@ -1,81 +1,145 @@
 'use client';
 
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import {
   ActionIcon,
   Card,
   Flex,
   Input,
+  Loader,
   Select,
   Table,
   Title,
+  Text,
+  Button,
 } from '@mantine/core';
-import { IconPencil, IconSearch, IconTrash } from '@tabler/icons-react';
+import { IconHandStop, IconLollipop, IconPencil, IconSearch, IconTrash } from '@tabler/icons-react';
 import { StoreContext } from '@/store/context';
 import { EditExperience } from './EditExperience';
+import { Column } from '../Layout/Column';
+import { SearchBar } from '../Atoms/SearchBar';
+import { ExperienceType } from '@/constants';
+import { Circle } from '../Atoms/Circle';
+import { Row } from '../Layout/Row';
+import Link from 'next/link';
 
 export function ExperiencesTable() {
-  const [store, setStore] = useContext(StoreContext);
+  const [{ experiences, experiencesLoading }, setStore] = useContext(StoreContext);
 
-  const rows = store.experiences.map((element) => (
-    <Table.Tr key={element.participant1}>
-      <Table.Td>{element.participant1}</Table.Td>
-      <Table.Td>{element.participant2}</Table.Td>
-      <Table.Td>{element.level}</Table.Td>
-      <Table.Td>{element.date}</Table.Td>
-      <Table.Td>
-        <ActionIcon variant="subtle">
-          <IconPencil color="blue" />
-        </ActionIcon>
-      </Table.Td>
-      <Table.Td>
-        <ActionIcon variant="subtle">
-          <IconTrash color="red" />
-        </ActionIcon>
-      </Table.Td>
-    </Table.Tr>
-  ));
+  const [search, setSearch] = useState('');
+
+  const rows = experiences.map((experience) => {
+    const {
+      uniqueId,
+      createdBy,
+      selectedParticipants,
+      date,
+      phaseDuration,
+      experienceType,
+      historyLength,
+      rateOfTesting,
+      highSync,
+      lowSync,
+      pendulumRotation,
+      highSyncColor,
+      midSyncColor,
+      lowSyncColor,
+      avgSyncHands,
+      avgSyncPendulum
+    } = experience;
+    return (
+      <Table.Tr flex="col" key={uniqueId}>
+        <Table.Td>{createdBy}</Table.Td>
+        <Table.Td>{selectedParticipants[0].name}</Table.Td>
+        <Table.Td>{selectedParticipants[1].name}</Table.Td>
+        <Table.Td>
+          {new Date(date).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })}
+          {', '}
+          {new Date(date).toLocaleDateString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit' })}
+        </Table.Td>
+        <Table.Td>
+          <Row align={'center'} gap={4}>
+            <Text size={'sm'}>
+              {avgSyncHands}%
+            </Text>
+            {experienceType.includes(ExperienceType.Hands) && <IconHandStop stroke={1.1} />}
+            {experienceType.includes(ExperienceType.Pendulum) && (
+              <Row>
+                <IconLollipop style={{ transform: 'rotate(180deg)' }} stroke={1} />
+                <Text size={'sm'}>
+                  {avgSyncPendulum}%
+                </Text>
+              </Row>
+            )}
+          </Row>
+        </Table.Td>
+        <Table.Td>
+          <Text fw={500} size={'sm'}>
+            {`${historyLength} x ${rateOfTesting / 1000} ms`}
+          </Text>
+        </Table.Td>
+        <Table.Td>
+          <Link href={`experiences/${uniqueId}`}>
+            <Button>
+              Explore
+            </Button>
+          </Link>
+        </Table.Td>
+      </Table.Tr>
+    )
+  });
+
+  const filteredExperiences = experiences
+    .filter((experience) => {
+      return (
+        experience.createdBy.toLowerCase().includes(search.toLowerCase()) ||
+        experience.createdByEmail.toLowerCase().includes(search.toLowerCase()) ||
+        experience.selectedParticipants[0].email.toLowerCase().includes(search.toLowerCase()) ||
+        experience.selectedParticipants[0].sex.toLowerCase().includes(search.toLowerCase()) ||
+        experience.selectedParticipants[0].name.toLowerCase().includes(search.toLowerCase()) ||
+        experience.selectedParticipants[1].email.toLowerCase().includes(search.toLowerCase()) ||
+        experience.selectedParticipants[1].sex.toLowerCase().includes(search.toLowerCase()) ||
+        experience.selectedParticipants[1].name.toLowerCase().includes(search.toLowerCase()) ||
+        ExperienceType.Hands.toLowerCase().includes(search.toLowerCase()) && experience.experienceType.includes(ExperienceType.Hands) ||
+        ExperienceType.Pendulum.toLowerCase().includes(search.toLowerCase()) && experience.experienceType.includes(ExperienceType.Pendulum)
+      );
+    })
 
   return (
     <Flex direction="column" w="100%">
       <Flex align="flex-end">
-        <Input.Wrapper label="7/221 Displayed">
-          <Input
-            w={450}
-            maw={450}
-            leftSection={
-              <ActionIcon variant="subtle">
-                <IconSearch />
-              </ActionIcon>
-            }
-            styles={{ input: { borderRadius: 300 } }}
-            placeholder="Search for an Experience..."
-          />
-        </Input.Wrapper>
-
-        <Input.Wrapper ml="auto" label="Sort by">
-          <Select data={['Last Experience (Increasing)']} value="Last Experience (Increasing)" />
-        </Input.Wrapper>
+        <SearchBar
+          onChange={(event) => setSearch(event.currentTarget.value)}
+          currentNumber={filteredExperiences.length}
+          totalNumber={experiences.length}
+          searchingFor={'Experience'}
+        />
       </Flex>
       <Card mt={16} shadow="xs">
         <Flex justify="space-between" align="center">
           <Title size="16px">Sessions</Title>
         </Flex>
-        <Table mt={20}>
-          <Table.Thead>
-            <Table.Tr>
-              <Table.Th>Participant 1</Table.Th>
-              <Table.Th>Participant 2</Table.Th>
-              <Table.Th>Level of Synchronization</Table.Th>
-              <Table.Th>Date</Table.Th>
-              <Table.Th>Edit</Table.Th>
-              <Table.Th>Delete</Table.Th>
-            </Table.Tr>
-          </Table.Thead>
-          <Table.Tbody>{rows}</Table.Tbody>
-        </Table>
+        {experiencesLoading ? (
+          <Column align={'center'} justify={'center'} mih={200}>
+            <Loader />
+          </Column>
+        ) : (
+          <Table mt={20}>
+            <Table.Thead>
+              <Table.Tr>
+                <Table.Th>Created By</Table.Th>
+                <Table.Th>Participant 1</Table.Th>
+                <Table.Th>Participant 2</Table.Th>
+                <Table.Th>Date</Table.Th>
+                <Table.Th>Avg Sync</Table.Th>
+                <Table.Th>History</Table.Th>
+                <Table.Th>Overview</Table.Th>
+              </Table.Tr>
+            </Table.Thead>
+            <Table.Tbody>{rows}</Table.Tbody>
+          </Table>
+        )}
       </Card>
-      <EditExperience />
     </Flex>
   );
 }

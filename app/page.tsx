@@ -1,8 +1,5 @@
-import Participants from "./participants/page";
-import Scheduler from "./Scheduler/page";
+import { redirect } from "next/navigation";
 
 export default function HomePage() {
-  return (
-    <Participants />
-  );
+  redirect('/scheduler');
 }

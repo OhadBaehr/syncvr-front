@@ -1,3 +1,4 @@
+'use client'
 import React, { useContext, useState } from 'react';
 import {
   AreaChart,
@@ -15,38 +16,49 @@ import {
 import { Title, Card, Input, Select, Flex, Button } from '@mantine/core';
 import { Note } from './Note';
 import { StoreContext } from '@/store/context';
+import { ExperienceType } from '@/constants';
+import { redirect, useParams, useSearchParams } from 'next/navigation';
+
 
 export function EditExperience() {
-  const [store] = useContext(StoreContext);
-  const { synclevel, personalForms } = store;
+  const searchParams = useParams();
+  const { uniqueId } = searchParams
+  const [{ experiences, experiencesLoading }] = useContext(StoreContext);
+  const [mode, setMode] = useState(ExperienceType.Hands);
 
-  const [mode, setMode] = useState('Hands');
-  const [syncAlgo, setSyncAlgo] = useState('Pearson');
+  console.log(experiences, uniqueId)
+  const thisExperience = experiences.find(experience => experience.uniqueId === uniqueId)
 
-  const handleModeChange = (value) => {
+  if (!thisExperience) return
+
+  const {
+    date,
+    selectedParticipants
+  } = thisExperience
+
+
+  const handleModeChange = (value: ExperienceType) => {
     setMode(value);
   };
 
-  const handleSyncAlgoChange = (value) => {
-    setSyncAlgo(value);
-  };
 
-  const selectOptions = ['Hands', 'Pendulum'].map((option) => ({
+  const selectOptions = [ExperienceType.Hands, ExperienceType.Pendulum].map((option) => ({
     label: option,
     value: option,
     disabled: option === mode,
   }));
 
-  const algoOptions = ['Pearson', 'Spearman', 'Third'].map((option) => ({
-    label: option,
-    value: option,
-    disabled: option === syncAlgo,
-  }));
+  // const algoOptions = ['Pearson', 'Spearman', 'Third'].map((option) => ({
+  //   label: option,
+  //   value: option,
+  //   disabled: option === syncAlgo,
+  // }));
 
+  const dateStr = new Date(date).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true }) + ', ' + new Date(date).toLocaleDateString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit' })
   return (
     <>
       <Title mt={10} mb={20} size="20px">
-        Ohad Beahr & Itay Aharoni - 27.3.24
+        {`${selectedParticipants[0].name} & ${selectedParticipants[1].name} - ${dateStr}`}
       </Title>
       <Flex wrap="wrap" gap={24}>
         <Flex flex={1} direction="column">
@@ -56,13 +68,13 @@ export function EditExperience() {
             </Title>
             <Flex align="center" mb={10}>
               <Input.Wrapper ml="auto" label="Mode">
-                <Select data={selectOptions} value={mode} onChange={handleModeChange} />
+                <Select data={selectOptions} value={mode} onChange={(mode => handleModeChange(mode as ExperienceType))} />
               </Input.Wrapper>
-              <Input.Wrapper ml={10} label="Synchronization Algorithm">
+              {/* <Input.Wrapper ml={10} label="Synchronization Algorithm">
                 <Select data={algoOptions} value={syncAlgo} onChange={handleSyncAlgoChange} />
-              </Input.Wrapper>
+              </Input.Wrapper> */}
             </Flex>
-            <ResponsiveContainer width="100%" height={400}>
+            {/* <ResponsiveContainer width="100%" height={400}>
               <AreaChart data={synclevel} margin={{ top: 20, right: 30, left: 40, bottom: 20 }}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis
@@ -90,13 +102,13 @@ export function EditExperience() {
                 <Tooltip />
                 <Area type="monotone" dataKey="level" stroke="#8884d8" fill="#8884d8" />
               </AreaChart>
-            </ResponsiveContainer>
+            </ResponsiveContainer> */}
           </Card>
           <Card>
             <Title size="16px" order={2}>
               Interpersonal Connection Forms
             </Title>
-            <ResponsiveContainer width="100%" height={500}>
+            {/* <ResponsiveContainer width="100%" height={500}>
               <BarChart data={personalForms} margin={{ bottom: 40 }}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis
@@ -124,7 +136,7 @@ export function EditExperience() {
                 <Bar dataKey="answer1" fill="#8884d8" name="Itay" />
                 <Bar dataKey="answer2" fill="#82ca9d" name="Ohad" />
               </BarChart>
-            </ResponsiveContainer>
+            </ResponsiveContainer> */}
           </Card>
 
 

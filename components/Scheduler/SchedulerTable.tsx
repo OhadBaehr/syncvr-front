@@ -1,5 +1,5 @@
 'use client';
-import { ActionIcon, Card, Flex, Table, Text, Title, Button } from '@mantine/core';
+import { ActionIcon, Card, Flex, Table, Text, Title, Button, Loader } from '@mantine/core';
 import { IconHandStop, IconLollipop, IconPencil, IconTrash } from '@tabler/icons-react';
 import { useDisclosure } from '@mantine/hooks';
 import { Configuration } from './Configuration';
@@ -12,9 +12,11 @@ import { ExperienceType } from '@/constants';
 import { ScheduledExperience } from '@/types';
 import { showNotification } from '@mantine/notifications';
 import axios from 'axios';
+import { debounce, set, throttle } from 'lodash';
+import { Column } from '../Layout/Column';
 
-export function ScheduledExperiences() {
-    const [{ scheduled }, setStore] = useContext(StoreContext);
+export function SchedulerTable() {
+    const [{ scheduled, schedulerLoading }, setStore] = useContext(StoreContext);
     const [opened, { open, close, toggle }] = useDisclosure(false);
     const [search, setSearch] = useState('');
     const [editScheduled, setEditScheduled] = useState<ScheduledExperience | undefined>();
@@ -41,7 +43,9 @@ export function ScheduledExperiences() {
             );
         })
 
-    const handleCreateSchedule = (scheduledExperience: ScheduledExperience) => {
+    const handleCreateSchedule = debounce(throttle((scheduledExperience: ScheduledExperience) => {
+        if (loading) return
+        setLoading(true);
         if (editScheduled) {
             axios.put(`/api/scheduled`, scheduledExperience)
                 .then(() => {
@@ -56,7 +60,7 @@ export function ScheduledExperiences() {
         } else {
             axios.post('/api/scheduled', scheduledExperience)
                 .then(() => {
-                    setStore(prev => ({ ...prev, scheduled: [...prev.scheduled, scheduledExperience] }))
+                    setStore(prev => ({ ...prev, scheduled: [scheduledExperience, ...prev.scheduled] }))
                     showNotification({ message: 'Experience created successfully!', color: 'green' });
                     close();
                 })
@@ -64,7 +68,9 @@ export function ScheduledExperiences() {
                     showNotification({ message: 'Failed to create experience. Please try again.', color: 'red' });
                 });
         }
-    }
+        setEditScheduled(undefined)
+        setLoading(false);
+    }, 5000), 300)
 
     const handleOpen = () => {
         setEditScheduled(undefined);
@@ -102,7 +108,8 @@ export function ScheduledExperiences() {
             pendulumRotation,
             highSyncColor,
             midSyncColor,
-            lowSyncColor
+            lowSyncColor,
+            sessionId
         } = experience;
         return (
             <Table.Tr flex="col" key={uniqueId}>
@@ -146,6 +153,7 @@ export function ScheduledExperiences() {
                         {highSync}
                     </Row>
                 </Table.Td>
+                <Table.Td>{sessionId}</Table.Td>
                 <Table.Td>
                     <ActionIcon onClick={() => handleEditClick(experience)} variant="subtle">
                         <IconPencil color="blue" />
@@ -172,26 +180,34 @@ export function ScheduledExperiences() {
             <Card mt={16} shadow="xs">
                 <Flex>
                     <Title size="16px" mb={10}>Scheduled Experiences</Title>
-                    <Button onClick={handleOpen} ml="auto">
+                    <Button disabled={scheduled.length >= 100} onClick={handleOpen} ml="auto">
                         Schedule New Experience
                     </Button>
                 </Flex>
-                <Table mt={20}>
-                    <Table.Thead>
-                        <Table.Tr>
-                            <Table.Th>Created By</Table.Th>
-                            <Table.Th>Participant 1</Table.Th>
-                            <Table.Th>Participant 2</Table.Th>
-                            <Table.Th>Date</Table.Th>
-                            <Table.Th>Mode</Table.Th>
-                            <Table.Th>History</Table.Th>
-                            <Table.Th>Sync Level</Table.Th>
-                            <Table.Th>Edit</Table.Th>
-                            <Table.Th>Delete</Table.Th>
-                        </Table.Tr>
-                    </Table.Thead>
-                    <Table.Tbody>{rows}</Table.Tbody>
-                </Table>
+                {schedulerLoading ? (
+                    <Column align={'center'} justify={'center'} mih={200}>
+                        <Loader />
+                    </Column>
+                ) : (
+                    <Table mt={20}>
+                        <Table.Thead>
+                            <Table.Tr>
+                                <Table.Th>Created By</Table.Th>
+                                <Table.Th>Participant 1</Table.Th>
+                                <Table.Th>Participant 2</Table.Th>
+                                <Table.Th>Date</Table.Th>
+                                <Table.Th>Mode</Table.Th>
+                                <Table.Th>History</Table.Th>
+                                <Table.Th>Sync Level</Table.Th>
+                                <Table.Th>Session ID</Table.Th>
+                                <Table.Th>Edit</Table.Th>
+                                <Table.Th>Delete</Table.Th>
+                            </Table.Tr>
+                        </Table.Thead>
+                        <Table.Tbody>{rows}</Table.Tbody>
+                    </Table>
+                )}
+
             </Card>
             <Configuration
                 loading={loading}
