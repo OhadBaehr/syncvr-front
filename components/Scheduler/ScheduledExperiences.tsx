@@ -42,16 +42,50 @@ export function ScheduledExperiences() {
         })
 
     const handleCreateSchedule = (scheduledExperience: ScheduledExperience) => {
-        axios.post('/api/scheduled', scheduledExperience)
-          .then(() => {
-            setStore(prev=>({...prev, scheduled: [...prev.scheduled, scheduledExperience]}))
-            showNotification({ message: 'Experience created successfully!', color: 'green' });
-            close();
-          })
-          .catch(() => {
-            showNotification({ message: 'Failed to create experience. Please try again.', color: 'red' });
-          });
+        if (editScheduled) {
+            axios.put(`/api/scheduled`, scheduledExperience)
+                .then(() => {
+                    setStore(prev => ({ ...prev, scheduled: prev.scheduled.map((exp) => exp.uniqueId === editScheduled.uniqueId ? scheduledExperience : exp) }))
+                    showNotification({ message: 'Experience updated successfully!', color: 'green' });
+                    close();
+                })
+                .catch(() => {
+                    showNotification({ message: 'Failed to update experience. Please try again.', color: 'red' });
+                });
+            return;
+        } else {
+            axios.post('/api/scheduled', scheduledExperience)
+                .then(() => {
+                    setStore(prev => ({ ...prev, scheduled: [...prev.scheduled, scheduledExperience] }))
+                    showNotification({ message: 'Experience created successfully!', color: 'green' });
+                    close();
+                })
+                .catch(() => {
+                    showNotification({ message: 'Failed to create experience. Please try again.', color: 'red' });
+                });
+        }
     }
+
+    const handleOpen = () => {
+        setEditScheduled(undefined);
+        open();
+    }
+
+    const deleteScheduled = (scheduledExperience: ScheduledExperience) => {
+        axios.delete(`/api/scheduled`, {
+            params: { uniqueId: scheduledExperience.uniqueId }
+        })
+            .then(() => {
+                setStore(prev => ({
+                    ...prev,
+                    scheduled: prev.scheduled.filter(exp => exp.uniqueId !== scheduledExperience.uniqueId)
+                }));
+                showNotification({ message: 'Experience deleted successfully!', color: 'green' });
+            })
+            .catch(() => {
+                showNotification({ message: 'Failed to delete experience. Please try again.', color: 'red' });
+            });
+    };
 
     const rows = filteredScheduled.map((experience) => {
         const {
@@ -113,12 +147,12 @@ export function ScheduledExperiences() {
                     </Row>
                 </Table.Td>
                 <Table.Td>
-                    <ActionIcon onClick={()=>handleEditClick(experience)} variant="subtle">
+                    <ActionIcon onClick={() => handleEditClick(experience)} variant="subtle">
                         <IconPencil color="blue" />
                     </ActionIcon>
                 </Table.Td>
                 <Table.Td>
-                    <ActionIcon variant="subtle">
+                    <ActionIcon onClick={() => deleteScheduled(experience)} variant="subtle">
                         <IconTrash color="red" />
                     </ActionIcon>
                 </Table.Td>
@@ -138,7 +172,7 @@ export function ScheduledExperiences() {
             <Card mt={16} shadow="xs">
                 <Flex>
                     <Title size="16px" mb={10}>Scheduled Experiences</Title>
-                    <Button onClick={open} ml="auto">
+                    <Button onClick={handleOpen} ml="auto">
                         Schedule New Experience
                     </Button>
                 </Flex>
@@ -159,7 +193,7 @@ export function ScheduledExperiences() {
                     <Table.Tbody>{rows}</Table.Tbody>
                 </Table>
             </Card>
-            <Configuration 
+            <Configuration
                 loading={loading}
                 disclosure={[opened, { open, close, toggle }]}
                 onCreateSchedule={handleCreateSchedule}

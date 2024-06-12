@@ -1,4 +1,4 @@
-import React, { useContext, useRef, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import {
   Flex,
   Divider,
@@ -58,25 +58,72 @@ interface ConfigurationProps {
 }
 
 export function Configuration({ loading, onCreateSchedule, initialValues, disclosure }: ConfigurationProps) {
+  const defaultValues = {
+    selectedParticipants: [],
+    phaseDuration: '60s',
+    historyLength: 15,
+    rateOfTesting: 150,
+    highSyncColor: 'rgb(93, 190, 232)',
+    midSyncColor: 'rgba(224, 175, 52)',
+    lowSyncColor: 'rgba(227, 52, 52)',
+    date: null,
+    highSync: 70,
+    lowSync: 40,
+    experienceType: ['hands'],
+    pendulumRotation: '180deg',
+  }
+
   const [opened, { close }] = disclosure;
   const [{ participants }] = useContext(StoreContext);
   const { user } = useUser()
-  const [selectedParticipants, setSelectedParticipants] = useState<Participant[]>(initialValues?.selectedParticipants ?? []);
-  const [phaseDurationStr, setPhaseDurationStr] = useState(initialValues?.phaseDuration ? initialValues.phaseDuration.toString() + 's' : '60s');
-  const [historyLength, setHistoryLength] = useState(initialValues?.historyLength ?? 15);
-  const [rateOfTesting, setRateOfTesting] = useState(initialValues?.rateOfTesting ?? 150);
-  const [highSyncColor, setHighSyncColor] = useState(initialValues?.highSyncColor ?? 'rgb(93, 190, 232)');
-  const [midSyncColor, setMidSyncColor] = useState(initialValues?.midSyncColor ?? 'rgba(224, 175, 52)');
-  const [lowSyncColor, setLowSyncColor] = useState(initialValues?.lowSyncColor ?? 'rgba(227, 52, 52)');
-  const [time, setTime] = useState(initialValues?.date ? new Date((initialValues.date)).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true }) : '00:00');
+  const [selectedParticipants, setSelectedParticipants] = useState<Participant[]>(defaultValues.selectedParticipants);
+  const [phaseDurationStr, setPhaseDurationStr] = useState(defaultValues.phaseDuration);
+  const [historyLength, setHistoryLength] = useState(defaultValues.historyLength);
+  const [rateOfTesting, setRateOfTesting] = useState(defaultValues.rateOfTesting);
+  const [highSyncColor, setHighSyncColor] = useState(defaultValues.highSyncColor);
+  const [midSyncColor, setMidSyncColor] = useState(defaultValues.midSyncColor);
+  const [lowSyncColor, setLowSyncColor] = useState(defaultValues.lowSyncColor);
+  const [time, setTime] = useState('12:00');
 
-  const [highSync, setHighSync] = useState(initialValues?.highSync ?? 70);
-  const [lowSync, setLowSync] = useState(initialValues?.lowSync ?? 40);
-  const [date, setDate] = useState<Date | null>(initialValues?.date ?? null);
-  const [experienceType, setExperienceType] = useState<string[]>(initialValues?.experienceType ?? ['hands']);
-  const [pendulumRotationStr, setPendulumRotationStr] = useState(initialValues?.pendulumRotation? initialValues.pendulumRotation.toString() + 'deg' : '180deg');
+  const [highSync, setHighSync] = useState(defaultValues.highSync);
+  const [lowSync, setLowSync] = useState(defaultValues.lowSync);
+  const [date, setDate] = useState<Date | null>(defaultValues.date);
+  const [experienceType, setExperienceType] = useState<string[]>(defaultValues.experienceType);
+  const [pendulumRotationStr, setPendulumRotationStr] = useState(defaultValues.pendulumRotation);
 
   const hourRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (initialValues) {
+      setSelectedParticipants(initialValues.selectedParticipants)
+      setPhaseDurationStr(initialValues.phaseDuration.toString() + 's')
+      setHistoryLength(initialValues.historyLength)
+      setRateOfTesting(initialValues.rateOfTesting)
+      setHighSyncColor(initialValues.highSyncColor)
+      setMidSyncColor(initialValues.midSyncColor)
+      setLowSyncColor(initialValues.lowSyncColor)
+      setTime(new Date((initialValues.date)).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false }).split(' ')[0])
+      setHighSync(initialValues.highSync)
+      setLowSync(initialValues.lowSync)
+      setDate(new Date(initialValues.date))
+      setExperienceType(initialValues.experienceType)
+      setPendulumRotationStr(initialValues.pendulumRotation.toString() + 'deg')
+    } else {
+      setSelectedParticipants(defaultValues.selectedParticipants);
+      setPhaseDurationStr(defaultValues.phaseDuration);
+      setHistoryLength(defaultValues.historyLength);
+      setRateOfTesting(defaultValues.rateOfTesting);
+      setHighSyncColor(defaultValues.highSyncColor);
+      setMidSyncColor(defaultValues.midSyncColor);
+      setLowSyncColor(defaultValues.lowSyncColor);
+      setTime('12:00');
+      setHighSync(defaultValues.highSync);
+      setLowSync(defaultValues.lowSync);
+      setDate(null);
+      setExperienceType(defaultValues.experienceType);
+      setPendulumRotationStr(defaultValues.pendulumRotation);
+    }
+  }, [initialValues])
 
   const handleSelect = (value: string[]) => {
     setSelectedParticipants(value.map((email) => participants.find((participant) => participant.email === email)!));
@@ -148,7 +195,7 @@ export function Configuration({ loading, onCreateSchedule, initialValues, disclo
     combinedDate.setMinutes(minutes);
 
     const experienceData = {
-      uniqueId: uuid(),
+      uniqueId: initialValues?.uniqueId ?? uuid(),
       createdByEmail: user.email as string,
       createdBy: user.name as string,
       selectedParticipants,
