@@ -1,3 +1,4 @@
+import { uniqueId } from "lodash"
 import { ExperienceType } from "./constants"
 
 export interface FullUser {
@@ -22,6 +23,17 @@ export interface Participant {
     email: string;
     sex: string;
     lastExperience: string;
+}
+
+export interface INote {
+    noteId: string;
+    content: string;
+    date: string;
+    uniqueId: string;
+    author: {
+        name: string
+        email: string
+    };
 }
 
 export interface Experience extends ScheduledExperience {

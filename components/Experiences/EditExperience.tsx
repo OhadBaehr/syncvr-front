@@ -18,6 +18,12 @@ import { Note } from './Note';
 import { StoreContext } from '@/store/context';
 import { ExperienceType } from '@/constants';
 import { redirect, useParams, useSearchParams } from 'next/navigation';
+import useSWR from 'swr';
+import axios from 'axios';
+import { INote } from '@/types';
+import { useDisclosure } from '@mantine/hooks';
+import { EditNote } from './EditNote';
+import { showNotification } from '@mantine/notifications';
 
 
 export function EditExperience() {
@@ -25,8 +31,18 @@ export function EditExperience() {
   const { uniqueId } = searchParams
   const [{ experiences, experiencesLoading }] = useContext(StoreContext);
   const [mode, setMode] = useState(ExperienceType.Hands);
+  const disclosure = useDisclosure(false);
+  const [opened, { open, close, toggle }] = disclosure
 
-  console.log(experiences, uniqueId)
+  const [notes, setNotes] = useState<INote[]>([]);
+  const [editNote, setEditNote] = useState<INote | undefined>(undefined)
+
+  useSWR<INote[]>(`/api/notes?uniqueId=${uniqueId}`, (url: string) => axios.get(url).then(res => res.data), {
+    onSuccess: (data) => {
+      setNotes(data);
+    }
+  });
+
   const thisExperience = experiences.find(experience => experience.uniqueId === uniqueId)
 
   if (!thisExperience) return
@@ -35,6 +51,7 @@ export function EditExperience() {
     date,
     selectedParticipants
   } = thisExperience
+
 
 
   const handleModeChange = (value: ExperienceType) => {
@@ -53,6 +70,20 @@ export function EditExperience() {
   //   value: option,
   //   disabled: option === syncAlgo,
   // }));
+
+  function onEditNote(note: INote) {
+    setEditNote(note)
+    open()
+  }
+
+  function onDeleteNote(note: INote) {
+    axios.delete(`/api/notes?noteId=${note.noteId}`).then(() => {
+      setNotes(prev => prev.filter(note => note.noteId !== note.noteId))
+      showNotification({ message: 'Note deleted successfully!', color: 'green' });
+    }).catch(() => {
+      showNotification({ message: 'Failed to delete note. Please try again.', color: 'red' });
+    })
+  }
 
   const dateStr = new Date(date).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true }) + ', ' + new Date(date).toLocaleDateString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit' })
   return (
@@ -138,30 +169,22 @@ export function EditExperience() {
               </BarChart>
             </ResponsiveContainer> */}
           </Card>
-
-
-
-
-
-
-
         </Flex>
-        <Card>
+        <Card miw={440}>
           <Flex justify="space-between" align="center" style={{ marginBottom: '10px' }}>
             <Title size="16px" order={2}>
               Notes
             </Title>
-            <Button variant="transparent" color="gray" style={{ marginRight: 0, fontSize: '12px' }}>
-              View All Notes
-            </Button>
           </Flex>
-          <Note />
-          <Note />
-          <Note />
+          {notes?.map(note => <Note onDelete={onDeleteNote} onEdit={onEditNote} key={note.noteId} note={note} />)}
           <Flex justify="center">
-            <Button w="90%">Add Note</Button>
+            <Button onClick={() => {
+              setEditNote(undefined)
+              open()
+            }} w="90%">Add Note</Button>
           </Flex>
         </Card>
+        <EditNote initialValues={editNote} disclosure={disclosure} uniqueId={uniqueId as string} setNotes={setNotes} />
       </Flex>
     </>
   );
