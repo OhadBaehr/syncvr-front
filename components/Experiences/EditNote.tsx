@@ -20,20 +20,22 @@ export function EditNote({ disclosure, initialValues, uniqueId, setNotes }: Edit
     const textRef = useRef<HTMLTextAreaElement>(null)
 
     function handleSave() {
+        if (!textRef.current?.value) return showNotification({ message: 'Note cannot be empty.', color: 'red' })
+        const content = textRef.current.value;
         if (initialValues) {
             axios.put(`/api/notes`, {
-                content: textRef.current?.value,
+                content,
                 date: new Date(),
                 noteId: initialValues.noteId,
             }).then(() => {
-                setNotes(prev => prev.map(note => note.noteId === initialValues.noteId ? { ...note, content: textRef.current!.value } : note))
+                setNotes(prev => prev.map(note => note.noteId === initialValues.noteId ? { ...note, content } : note))
                 showNotification({ message: 'Note updated successfully!', color: 'green' });
             }).catch(() => {
                 showNotification({ message: 'Failed to update note. Please try again.', color: 'red' });
             })
         } else {
             axios.post('/api/notes', {
-                content: textRef.current?.value,
+                content,
                 date: new Date(),
                 noteId: uuid(),
                 author: {

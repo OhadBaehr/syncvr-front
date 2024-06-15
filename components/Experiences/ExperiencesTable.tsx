@@ -28,7 +28,24 @@ export function ExperiencesTable() {
 
   const [search, setSearch] = useState('');
 
-  const rows = experiences.map((experience) => {
+  const filteredExperiences = experiences
+    .filter((experience) => {
+      return (
+        experience.createdBy.toLowerCase().includes(search.toLowerCase()) ||
+        experience.createdByEmail.toLowerCase().includes(search.toLowerCase()) ||
+        experience.selectedParticipants[0].email.toLowerCase().includes(search.toLowerCase()) ||
+        experience.selectedParticipants[0].sex.toLowerCase().includes(search.toLowerCase()) ||
+        experience.selectedParticipants[0].name.toLowerCase().includes(search.toLowerCase()) ||
+        experience.selectedParticipants[1].email.toLowerCase().includes(search.toLowerCase()) ||
+        experience.selectedParticipants[1].sex.toLowerCase().includes(search.toLowerCase()) ||
+        experience.selectedParticipants[1].name.toLowerCase().includes(search.toLowerCase()) ||
+        ExperienceType.Hands.toLowerCase().includes(search.toLowerCase()) && experience.experienceType.includes(ExperienceType.Hands) ||
+        ExperienceType.Pendulum.toLowerCase().includes(search.toLowerCase()) && experience.experienceType.includes(ExperienceType.Pendulum)
+      );
+    })
+
+
+  const rows = filteredExperiences.map((experience) => {
     const {
       uniqueId,
       createdBy,
@@ -89,21 +106,6 @@ export function ExperiencesTable() {
     )
   });
 
-  const filteredExperiences = experiences
-    .filter((experience) => {
-      return (
-        experience.createdBy.toLowerCase().includes(search.toLowerCase()) ||
-        experience.createdByEmail.toLowerCase().includes(search.toLowerCase()) ||
-        experience.selectedParticipants[0].email.toLowerCase().includes(search.toLowerCase()) ||
-        experience.selectedParticipants[0].sex.toLowerCase().includes(search.toLowerCase()) ||
-        experience.selectedParticipants[0].name.toLowerCase().includes(search.toLowerCase()) ||
-        experience.selectedParticipants[1].email.toLowerCase().includes(search.toLowerCase()) ||
-        experience.selectedParticipants[1].sex.toLowerCase().includes(search.toLowerCase()) ||
-        experience.selectedParticipants[1].name.toLowerCase().includes(search.toLowerCase()) ||
-        ExperienceType.Hands.toLowerCase().includes(search.toLowerCase()) && experience.experienceType.includes(ExperienceType.Hands) ||
-        ExperienceType.Pendulum.toLowerCase().includes(search.toLowerCase()) && experience.experienceType.includes(ExperienceType.Pendulum)
-      );
-    })
 
   return (
     <Flex direction="column" w="100%">
