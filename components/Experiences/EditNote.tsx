@@ -49,7 +49,7 @@ export function EditNote({ disclosure, initialValues, uniqueId, setNotes }: Edit
                     },
                     uniqueId,
                     content: textRef.current!.value,
-                    date: new Date().getTime().toString(),
+                    date: new Date().toString(),
                     noteId: uuid(),
                 }])
                 showNotification({ message: 'Note created successfully!', color: 'green' });

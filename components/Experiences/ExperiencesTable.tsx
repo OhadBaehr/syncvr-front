@@ -60,14 +60,14 @@ export function ExperiencesTable() {
         <Table.Td>
           <Row align={'center'} gap={4}>
             <Text size={'sm'}>
-              {avgSyncHands}%
+              {avgSyncHands.toFixed(2)}%
             </Text>
             {experienceType.includes(ExperienceType.Hands) && <IconHandStop stroke={1.1} />}
             {experienceType.includes(ExperienceType.Pendulum) && (
               <Row>
                 <IconLollipop style={{ transform: 'rotate(180deg)' }} stroke={1} />
                 <Text size={'sm'}>
-                  {avgSyncPendulum}%
+                  {avgSyncPendulum.toFixed(2)}%
                 </Text>
               </Row>
             )}

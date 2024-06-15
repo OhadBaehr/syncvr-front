@@ -128,6 +128,7 @@ export async function POST(request: Request) {
     try {
         const { db } = await connectToDatabase();
         const result = await db.collection('scheduled').insertOne({
+            done: false,
             sessionId,
             uniqueId,
             createdBy,

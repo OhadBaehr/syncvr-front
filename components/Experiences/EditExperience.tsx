@@ -1,18 +1,5 @@
 'use client'
-import React, { useContext, useState } from 'react';
-import {
-  AreaChart,
-  Area,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  BarChart,
-  Bar,
-  Legend,
-  Label
-} from 'recharts';
+import React, { useContext, useEffect, useState } from 'react';
 import { Title, Card, Input, Select, Flex, Button } from '@mantine/core';
 import { Note } from './Note';
 import { StoreContext } from '@/store/context';
@@ -20,28 +7,50 @@ import { ExperienceType } from '@/constants';
 import { redirect, useParams, useSearchParams } from 'next/navigation';
 import useSWR from 'swr';
 import axios from 'axios';
-import { INote } from '@/types';
+import { ChartData, Feedback, INote, Participant } from '@/types';
 import { useDisclosure } from '@mantine/hooks';
 import { EditNote } from './EditNote';
 import { showNotification } from '@mantine/notifications';
+import { AreaChart, AreaChartSeries, BarChart } from '@mantine/charts';
 
 
 export function EditExperience() {
   const searchParams = useParams();
   const { uniqueId } = searchParams
-  const [{ experiences, experiencesLoading }] = useContext(StoreContext);
+  const [{ experiences, experiencesLoading, participants }] = useContext(StoreContext);
   const [mode, setMode] = useState(ExperienceType.Hands);
   const disclosure = useDisclosure(false);
   const [opened, { open, close, toggle }] = disclosure
 
   const [notes, setNotes] = useState<INote[]>([]);
   const [editNote, setEditNote] = useState<INote | undefined>(undefined)
+  const [feedbackP1, setFeedbackP1] = useState<Feedback | null>(null);
+  const [feedbackP2, setFeedbackP2] = useState<Feedback | null>(null);
+  const [participant1, setParticipant1] = useState<Participant | undefined>(undefined)
+  const [participant2, setParticipant2] = useState<Participant | undefined>(undefined)
 
   useSWR<INote[]>(`/api/notes?uniqueId=${uniqueId}`, (url: string) => axios.get(url).then(res => res.data), {
     onSuccess: (data) => {
       setNotes(data);
     }
   });
+
+
+  useSWR<Feedback[]>(`/api/feedback?uniqueId=${uniqueId}`, (url: string) => axios.get(url).then(res => res.data), {
+    onSuccess: (data) => {
+      setFeedbackP1(data[0]);
+      setFeedbackP2(data[1]);
+    }
+  });
+
+  useEffect(() => {
+    if (feedbackP1) {
+      setParticipant1(participants.find(participant => participant.email === feedbackP1.email))
+    }
+    if (feedbackP2) {
+      setParticipant2(participants.find(participant => participant.email === feedbackP2.email))
+    }
+  }, [feedbackP1, feedbackP2, participants])
 
   const thisExperience = experiences.find(experience => experience.uniqueId === uniqueId)
 
@@ -85,6 +94,56 @@ export function EditExperience() {
     })
   }
 
+
+  function normalizeData() {
+    if (!feedbackP1 || !participant1?.name) return
+    const dataType = 'synchronizationHands'
+    const data: (Record<string, string> & { time: string })[] = []
+
+    if (!feedbackP2 || !participant2?.name) {
+      for (let i = 0; i < feedbackP1[dataType].length; i++) {
+        data.push({ time: feedbackP1[dataType][i].time.toFixed(3), [participant1.name]: feedbackP1[dataType][i].value.toFixed(3) })
+      }
+    } else {
+      const length = Math.min(feedbackP1[dataType].length, feedbackP2[dataType].length)
+      for (let i = 0; i < length; i++) {
+        data.push({
+          time: ((feedbackP1[dataType][i].time + feedbackP2[dataType][i].time) / 2).toFixed(3),
+          [participant1.name]: feedbackP1[dataType][i].value.toFixed(3),
+          [participant2.name]: feedbackP2[dataType][i].value.toFixed(3)
+        })
+      }
+    }
+    return data
+  }
+
+
+  function createSeries() {
+    const colors = ['indigo.6', 'violet.6']
+    const series: AreaChartSeries[] = []
+    if (feedbackP1) {
+      series.push({ name: participant1?.name as string, color: colors[0] })
+    }
+    if (feedbackP2) {
+      series.push({ name: participant2?.name as string, color: colors[1] })
+    }
+    return series
+  }
+
+  function createBarChartData() {
+    const p1Answers = feedbackP1?.answers
+    const p2Answers = feedbackP2?.answers
+
+    if (!p1Answers || !p2Answers || !participant2 || !participant1) return []
+    const data: (Record<string, number> & { value: number })[] = []
+    const answersLength = Math.min(p1Answers.length, p2Answers.length)
+    for (let i = 0; i < answersLength; i++) {
+      data.push({ value: i + 1, [participant1?.name]: p1Answers[i], [participant2?.name]: p2Answers[i] })
+    }
+    return data
+  }
+
+  const series = createSeries()
   const dateStr = new Date(date).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true }) + ', ' + new Date(date).toLocaleDateString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit' })
   return (
     <>
@@ -105,69 +164,15 @@ export function EditExperience() {
                 <Select data={algoOptions} value={syncAlgo} onChange={handleSyncAlgoChange} />
               </Input.Wrapper> */}
             </Flex>
-            {/* <ResponsiveContainer width="100%" height={400}>
-              <AreaChart data={synclevel} margin={{ top: 20, right: 30, left: 40, bottom: 20 }}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis
-                  dataKey="time"
-                  interval={0}
-                  label={{
-                    value: 'Time',
-                    position: 'insideBottom',
-                    offset: -10,
-                    dy: 10,
-                    style: { textAnchor: 'middle' },
-                  }}
-                />
-                <YAxis
-                  domain={[0, 100]}
-                  ticks={[0, 20, 40, 60, 80, 100]}
-                  label={{
-                    value: 'Level of synchronization',
-                    angle: -90,
-                    position: 'insideLeft',
-                    dx: -30,
-                    style: { textAnchor: 'middle' },
-                  }}
-                />
-                <Tooltip />
-                <Area type="monotone" dataKey="level" stroke="#8884d8" fill="#8884d8" />
-              </AreaChart>
-            </ResponsiveContainer> */}
+            <AreaChart
+              h={400}
+              data={normalizeData() as Record<string, any>[]} series={series} dataKey={'time'} />
           </Card>
           <Card>
             <Title size="16px" order={2}>
               Interpersonal Connection Forms
             </Title>
-            {/* <ResponsiveContainer width="100%" height={500}>
-              <BarChart data={personalForms} margin={{ bottom: 40 }}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis
-                  dataKey="question"
-                  label={{
-                    value: 'Question',
-                    offset: 0,
-                    position: 'insideBottom',
-                    dy: 20,
-                  }}
-                  tickFormatter={(value) => `q${value.slice(1)}`}
-                />
-                <YAxis
-                  domain={[0, 5]}
-                  ticks={[0, 1, 2, 3, 4, 5]}
-                  label={{
-                    value: 'Score',
-                    angle: -90,
-                    position: 'insideLeft',
-                    style: { textAnchor: 'middle' },
-                  }}
-                />
-                <Tooltip />
-                <Legend verticalAlign="top" align="right" height={36} />
-                <Bar dataKey="answer1" fill="#8884d8" name="Itay" />
-                <Bar dataKey="answer2" fill="#82ca9d" name="Ohad" />
-              </BarChart>
-            </ResponsiveContainer> */}
+            <BarChart h={400} data={createBarChartData()} series={series} dataKey={'value'} />
           </Card>
         </Flex>
         <Card miw={440}>
@@ -185,7 +190,7 @@ export function EditExperience() {
           </Flex>
         </Card>
         <EditNote initialValues={editNote} disclosure={disclosure} uniqueId={uniqueId as string} setNotes={setNotes} />
-      </Flex>
+      </Flex >
     </>
   );
 }

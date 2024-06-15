@@ -59,3 +59,17 @@ export interface ScheduledExperience {
     lowSyncColor: string
     sessionId: string
 }
+
+
+export interface ChartData {
+    value: number
+    time: number
+}
+
+export interface Feedback {
+    uniqueId: string
+    email: string
+    answers: number[]
+    synchronizationHands: ChartData[]
+    synchronizationPendulum: ChartData[]
+}
