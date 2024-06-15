@@ -51,16 +51,9 @@ export function ExperiencesTable() {
       createdBy,
       selectedParticipants,
       date,
-      phaseDuration,
       experienceType,
       historyLength,
       rateOfTesting,
-      highSync,
-      lowSync,
-      pendulumRotation,
-      highSyncColor,
-      midSyncColor,
-      lowSyncColor,
       avgSyncHands,
       avgSyncPendulum
     } = experience;
