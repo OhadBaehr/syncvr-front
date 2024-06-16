@@ -3,7 +3,7 @@ import { useUser } from "@auth0/nextjs-auth0/client";
 import { Button, Input, Modal, Textarea } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import axios from "axios";
-import { Dispatch, SetStateAction, useRef } from "react";
+import { Dispatch, SetStateAction, useRef, useState } from "react";
 import { v4 as uuid } from "uuid";
 import { showNotification } from "@mantine/notifications";
 
@@ -17,11 +17,10 @@ interface EditNoteProps {
 export function EditNote({ disclosure, initialValues, uniqueId, setNotes }: EditNoteProps) {
     const { user } = useUser();
     const [opened, { close }] = disclosure;
-    const textRef = useRef<HTMLTextAreaElement>(null)
+    const [content, setContent] = useState(initialValues?.content || '');
 
     function handleSave() {
-        if (!textRef.current?.value) return showNotification({ message: 'Note cannot be empty.', color: 'red' })
-        const content = textRef.current.value;
+        if (!content) return showNotification({ message: 'Note cannot be empty.', color: 'red' })
         if (initialValues) {
             axios.put(`/api/notes`, {
                 content,
@@ -34,10 +33,11 @@ export function EditNote({ disclosure, initialValues, uniqueId, setNotes }: Edit
                 showNotification({ message: 'Failed to update note. Please try again.', color: 'red' });
             })
         } else {
+            const noteId = uuid()
             axios.post('/api/notes', {
                 content,
                 date: new Date(),
-                noteId: uuid(),
+                noteId: noteId,
                 author: {
                     name: user!.name,
                     email: user!.email
@@ -50,9 +50,9 @@ export function EditNote({ disclosure, initialValues, uniqueId, setNotes }: Edit
                         email: user!.email as string
                     },
                     uniqueId,
-                    content: textRef.current!.value,
+                    content,
                     date: new Date().toString(),
-                    noteId: uuid(),
+                    noteId: noteId,
                 }])
                 showNotification({ message: 'Note created successfully!', color: 'green' });
             }).catch(() => {
@@ -63,7 +63,7 @@ export function EditNote({ disclosure, initialValues, uniqueId, setNotes }: Edit
     }
     return (
         <Modal title={`${initialValues ? 'New Note' : "Note Update"} `} onClose={close} opened={opened}>
-            <Textarea ref={textRef} defaultValue={initialValues?.content} styles={{ input: { minHeight: 400 } }} placeholder="What are your findings?" />
+            <Textarea onChange={(e) => setContent(e.target.value)} defaultValue={initialValues?.content} styles={{ input: { minHeight: 400 } }} placeholder="What are your findings?" />
             <Button onClick={handleSave} w={'100%'} mt={8}>
                 Save
             </Button>
