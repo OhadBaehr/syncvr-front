@@ -11,10 +11,15 @@ interface InitialDataProviderProps {
 
 export function InitialDataProvider({ children }: InitialDataProviderProps) {
     const [{ schedulerLoading }, setStore] = useContext(StoreContext);
-    const fetcher = (url: string) => axios.get(url).then(res => res.data);
+    const fetcher = (url: string) => axios.get(url, {
+        headers: {
+            'Cache-Control': 'no-cache'
+        }
+    }).then(res => res.data);
+
     useSWR('/api/participants', fetcher, {
         revalidateOnFocus: true,
-        dedupingInterval: 60000, // Re-fetch the data if it's older than 1 minute
+        dedupingInterval: 10000,
         onSuccess: (data) => {
             setStore((prev) => ({ ...prev, participants: data, participantsLoading: false }));
         }
@@ -22,7 +27,7 @@ export function InitialDataProvider({ children }: InitialDataProviderProps) {
 
     useSWR('/api/scheduled', fetcher, {
         revalidateOnFocus: true,
-        dedupingInterval: 60000,
+        dedupingInterval: 10000,
         onSuccess: (data) => {
             setStore((prev) => ({ ...prev, scheduled: data, schedulerLoading: false }));
         }
@@ -30,7 +35,7 @@ export function InitialDataProvider({ children }: InitialDataProviderProps) {
 
     useSWR('/api/experiences', fetcher, {
         revalidateOnFocus: true,
-        dedupingInterval: 60000,
+        dedupingInterval: 10000,
         onSuccess: (data) => {
             setStore((prev) => ({ ...prev, experiences: data, experiencesLoading: false }));
         }
