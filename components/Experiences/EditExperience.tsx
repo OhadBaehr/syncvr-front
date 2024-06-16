@@ -97,7 +97,7 @@ export function EditExperience() {
 
   function normalizeData() {
     if (!feedbackP1 || !participant1?.name) return
-    const dataType = 'synchronizationHands'
+    const dataType = mode === ExperienceType.Pendulum ? 'synchronizationPendulum' : 'synchronizationHands'
     const data: (Record<string, string> & { time: string })[] = []
 
     if (!feedbackP2 || !participant2?.name) {
