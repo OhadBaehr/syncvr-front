@@ -11,22 +11,28 @@ interface InitialDataProviderProps {
 
 export function InitialDataProvider({ children }: InitialDataProviderProps) {
     const [{ schedulerLoading }, setStore] = useContext(StoreContext);
-    useSWR<Participant[]>('/api/participants', (url: string) => axios.get(url).then(res => res.data), {
+    const fetcher = (url: string) => axios.get(url).then(res => res.data);
+    useSWR('/api/participants', fetcher, {
+        revalidateOnFocus: true,
+        dedupingInterval: 60000, // Re-fetch the data if it's older than 1 minute
         onSuccess: (data) => {
-            setStore((prev) => ({ ...prev, participants: data, participantsLoading: false }))
+            setStore((prev) => ({ ...prev, participants: data, participantsLoading: false }));
         }
     });
 
-    useSWR<ScheduledExperience[]>('/api/scheduled', (url: string) => axios.get(url).then(res => res.data), {
+    useSWR('/api/scheduled', fetcher, {
+        revalidateOnFocus: true,
+        dedupingInterval: 60000,
         onSuccess: (data) => {
-            setStore((prev) => ({ ...prev, scheduled: data, schedulerLoading: false }))
+            setStore((prev) => ({ ...prev, scheduled: data, schedulerLoading: false }));
         }
     });
 
-
-    useSWR<Experience[]>('/api/experiences', (url: string) => axios.get(url).then(res => res.data), {
+    useSWR('/api/experiences', fetcher, {
+        revalidateOnFocus: true,
+        dedupingInterval: 60000,
         onSuccess: (data) => {
-            setStore((prev) => ({ ...prev, experiences: data, experiencesLoading: false }))
+            setStore((prev) => ({ ...prev, experiences: data, experiencesLoading: false }));
         }
     });
 
