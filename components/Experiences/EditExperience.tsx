@@ -1,6 +1,6 @@
 'use client'
 import React, { useContext, useEffect, useState } from 'react';
-import { Title, Card, Input, Select, Flex, Button } from '@mantine/core';
+import { Title, Card, Input, Select, Flex, Button, Box, Text } from '@mantine/core';
 import { Note } from './Note';
 import { StoreContext } from '@/store/context';
 import { ExperienceType } from '@/constants';
@@ -108,7 +108,7 @@ export function EditExperience() {
       const length = Math.min(feedbackP1[dataType].length, feedbackP2[dataType].length)
       for (let i = 0; i < length; i++) {
         data.push({
-          time: ((feedbackP1[dataType][i].time + feedbackP2[dataType][i].time) / 2).toFixed(3),
+          time: ((thisExperience?.phaseDuration ?? 0) - ((feedbackP1[dataType][i].time + feedbackP2[dataType][i].time) / 2)).toFixed(1) + 's',
           [participant1.name]: feedbackP1[dataType][i].value.toFixed(3),
           [participant2.name]: feedbackP2[dataType][i].value.toFixed(3)
         })
@@ -117,9 +117,8 @@ export function EditExperience() {
     return data
   }
 
-
+  const colors = ['indigo.5', 'violet.7',]
   function createSeries() {
-    const colors = ['indigo.6', 'violet.6']
     const series: AreaChartSeries[] = []
     if (feedbackP1) {
       series.push({ name: participant1?.name as string, color: colors[0] })
@@ -138,7 +137,7 @@ export function EditExperience() {
     const data: (Record<string, number> & { value: number })[] = []
     const answersLength = Math.min(p1Answers.length, p2Answers.length)
     for (let i = 0; i < answersLength; i++) {
-      data.push({ value: i + 1, [participant1?.name]: p1Answers[i], [participant2?.name]: p2Answers[i] })
+      data.push({ value: `Q ${i + 1}` as unknown as number, [participant1?.name]: p1Answers[i], [participant2?.name]: p2Answers[i] })
     }
     return data
   }
@@ -165,6 +164,9 @@ export function EditExperience() {
               </Input.Wrapper> */}
             </Flex>
             <AreaChart
+              withLegend
+              xAxisLabel='Time (s)'
+              yAxisLabel='Level of synchronization'
               h={400}
               data={normalizeData() as Record<string, any>[]} series={series} dataKey={'time'} />
           </Card>
@@ -172,7 +174,15 @@ export function EditExperience() {
             <Title size="16px" order={2}>
               Interpersonal Connection Forms
             </Title>
-            <BarChart h={400} data={createBarChartData()} series={series} dataKey={'value'} />
+            <BarChart
+              withLegend
+              xAxisLabel='Question Number'
+              yAxisLabel='Answer'
+              yAxisProps={{ domain: [0, 5] }}
+              h={400}
+              data={createBarChartData()}
+              series={series} dataKey={'value'}
+            />
           </Card>
         </Flex>
         <Card miw={440}>
