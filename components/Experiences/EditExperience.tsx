@@ -186,6 +186,7 @@ export function EditExperience() {
           </Card>
         </Flex>
         <Card miw={440}>
+
           <Flex justify="space-between" align="center" style={{ marginBottom: '10px' }}>
             <Title size="16px" order={2}>
               Notes
