@@ -1,7 +1,7 @@
 import { connectToDatabase } from "@/lib/mongodb";
 import { NextResponse } from "next/server";
 
-export async function GET() {
+export async function POST() {
     try {
         const { db } = await connectToDatabase();
         const scheduled = await db.collection('scheduled').find({ done: true }).sort({ createdAt: -1 }).toArray();
