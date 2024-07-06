@@ -61,8 +61,8 @@ export function Configuration({ loading, onCreateSchedule, initialValues, disclo
   const defaultValues = {
     selectedParticipants: [],
     phaseDuration: '60s',
-    historyLength: 15,
-    rateOfTesting: 30,
+    historyLength: 40,
+    rateOfTesting: 40,
     highSyncColor: 'rgb(93, 190, 232)',
     midSyncColor: 'rgb(224, 175, 52)',
     lowSyncColor: 'rgb(227, 52, 52)',
@@ -257,7 +257,7 @@ export function Configuration({ loading, onCreateSchedule, initialValues, disclo
             </Text>
             <InputDescription>How many data points the calculation has</InputDescription>
             <Row gap={8} align={'center'}>
-              <Slider w={'100%'} value={historyLength} onChange={handleHistoryLengthChange} min={5} max={25} />
+              <Slider w={'100%'} value={historyLength} onChange={handleHistoryLengthChange} min={10} max={50} />
               <Badge w={40}>{historyLength}</Badge>
             </Row>
           </Column>
