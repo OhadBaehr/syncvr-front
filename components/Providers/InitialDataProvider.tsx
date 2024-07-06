@@ -2,7 +2,7 @@
 import { StoreContext } from "@/store/context";
 import { Experience, Participant, ScheduledExperience } from "@/types";
 import axios from "axios";
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import useSWR from "swr";
 
 interface InitialDataProviderProps {
@@ -33,13 +33,23 @@ export function InitialDataProvider({ children }: InitialDataProviderProps) {
         }
     });
 
-    useSWR('/api/experiences', fetcher, {
-        revalidateOnFocus: true,
-        dedupingInterval: 10000,
-        onSuccess: (data) => {
-            setStore((prev) => ({ ...prev, experiences: data, experiencesLoading: false }));
-        }
-    });
+    useEffect(() => {
+        const fetchExperiences = async () => {
+            try {
+                const response = await axios.get('/api/experiences', {
+                    headers: {
+                        'Cache-Control': 'no-cache'
+                    }
+                });
+                setStore((prev) => ({ ...prev, experiences: response.data, experiencesLoading: false }));
+            } catch (error) {
+                console.error('Error fetching experiences:', error);
+                setStore((prev) => ({ ...prev, experiencesLoading: false }));
+            }
+        };
+
+        fetchExperiences();
+    }, [setStore]);
 
     return <>{children}</>
 }
