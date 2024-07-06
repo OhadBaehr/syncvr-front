@@ -362,7 +362,7 @@ export function Configuration({ loading, onCreateSchedule, initialValues, disclo
               />
             </Input.Wrapper>
           </Column>
-          <Button disabled={loading} mt={'auto'} onClick={handleSubmit}>Create Experience</Button>
+          <Button disabled={loading} mt={'auto'} onClick={handleSubmit}>{initialValues ? "Save changes" : "Create Experience"}</Button>
         </Column>
       </Row>
     </Modal>

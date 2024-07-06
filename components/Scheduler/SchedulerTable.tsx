@@ -44,33 +44,37 @@ export function SchedulerTable() {
         })
 
     const handleCreateSchedule = debounce(throttle((scheduledExperience: ScheduledExperience) => {
-        if (loading) return
+        if (loading) return;
         setLoading(true);
+
+        const handleSuccess = (message: string) => {
+            setStore(prev => ({
+                ...prev,
+                scheduled: editScheduled
+                    ? prev.scheduled.map((exp) => exp.uniqueId === editScheduled.uniqueId ? scheduledExperience : exp)
+                    : [scheduledExperience, ...prev.scheduled]
+            }));
+            showNotification({ message, color: 'green' });
+            close();
+            setLoading(false);
+            setEditScheduled(undefined);
+        };
+
+        const handleError = (message: string) => {
+            showNotification({ message, color: 'red' });
+            setLoading(false);
+        };
+
         if (editScheduled) {
             axios.put(`/api/scheduled`, scheduledExperience)
-                .then(() => {
-                    setStore(prev => ({ ...prev, scheduled: prev.scheduled.map((exp) => exp.uniqueId === editScheduled.uniqueId ? scheduledExperience : exp) }))
-                    showNotification({ message: 'Experience updated successfully!', color: 'green' });
-                    close();
-                })
-                .catch(() => {
-                    showNotification({ message: 'Failed to update experience. Please try again.', color: 'red' });
-                });
-            return;
+                .then(() => handleSuccess('Experience updated successfully!'))
+                .catch(() => handleError('Failed to update experience. Please try again.'));
         } else {
             axios.post('/api/scheduled', scheduledExperience)
-                .then(() => {
-                    setStore(prev => ({ ...prev, scheduled: [scheduledExperience, ...prev.scheduled] }))
-                    showNotification({ message: 'Experience created successfully!', color: 'green' });
-                    close();
-                })
-                .catch(() => {
-                    showNotification({ message: 'Failed to create experience. Please try again.', color: 'red' });
-                });
+                .then(() => handleSuccess('Experience created successfully!'))
+                .catch(() => handleError('Failed to create experience. Please try again.'));
         }
-        setEditScheduled(undefined)
-        setLoading(false);
-    }, 5000), 300)
+    }, 5000), 300);
 
     const handleOpen = () => {
         setEditScheduled(undefined);
