@@ -11,13 +11,13 @@ interface InitialDataProviderProps {
 
 export function InitialDataProvider({ children }: InitialDataProviderProps) {
     const [{ schedulerLoading }, setStore] = useContext(StoreContext);
-    const fetcher = (url: string) => axios.get(url, {
+    const fetcher = (url: string) => axios.post(url, {
         headers: {
             'Cache-Control': 'no-store'
         }
     }).then(res => res.data);
 
-    useSWR('/api/participants', fetcher, {
+    useSWR('/api/participants/fetch', fetcher, {
         revalidateOnFocus: true,
         dedupingInterval: 10000,
         onSuccess: (data) => {
@@ -25,7 +25,7 @@ export function InitialDataProvider({ children }: InitialDataProviderProps) {
         }
     });
 
-    useSWR('/api/scheduled', fetcher, {
+    useSWR('/api/scheduled/fetch', fetcher, {
         revalidateOnFocus: true,
         dedupingInterval: 10000,
         onSuccess: (data) => {
@@ -33,7 +33,7 @@ export function InitialDataProvider({ children }: InitialDataProviderProps) {
         }
     });
 
-    useSWR('/api/experiences', fetcher, {
+    useSWR('/api/experiences/fetch', fetcher, {
         revalidateOnFocus: true,
         dedupingInterval: 10000,
         onSuccess: (data) => {

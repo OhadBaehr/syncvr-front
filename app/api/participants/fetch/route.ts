@@ -3,7 +3,7 @@ import { connectToDatabase } from '@/lib/mongodb';
 import { Participant } from '@/types';
 import { WithId, Document } from 'mongodb';
 
-export async function GET() {
+export async function POST() {
     try {
         const { db } = await connectToDatabase();
         const participants = await db.collection('participants').find({}).toArray();
