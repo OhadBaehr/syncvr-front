@@ -257,7 +257,7 @@ export function Configuration({ loading, onCreateSchedule, initialValues, disclo
             </Text>
             <InputDescription>How many data points the calculation has</InputDescription>
             <Row gap={8} align={'center'}>
-              <Slider w={'100%'} value={historyLength} onChange={handleHistoryLengthChange} min={10} max={50} />
+              <Slider w={'100%'} value={historyLength} onChange={handleHistoryLengthChange} min={10} max={80} />
               <Badge w={40}>{historyLength}</Badge>
             </Row>
           </Column>
