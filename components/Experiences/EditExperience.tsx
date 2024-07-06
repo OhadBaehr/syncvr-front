@@ -1,6 +1,6 @@
 'use client'
 import React, { useContext, useEffect, useState } from 'react';
-import { Title, Card, Input, Select, Flex, Button, Box, Text } from '@mantine/core';
+import { Title, Card, Input, Select, Flex, Button, Box, Text, Table, ActionIcon } from '@mantine/core';
 import { Note } from './Note';
 import { StoreContext } from '@/store/context';
 import { ExperienceType } from '@/constants';
@@ -12,6 +12,10 @@ import { useDisclosure } from '@mantine/hooks';
 import { EditNote } from './EditNote';
 import { showNotification } from '@mantine/notifications';
 import { AreaChart, AreaChartSeries, BarChart } from '@mantine/charts';
+import { IconHandStop, IconLollipop, IconPencil, IconTrash } from '@tabler/icons-react';
+import Link from 'next/link';
+import { Row } from '../Layout/Row';
+import { Circle } from '../Atoms/Circle';
 
 
 export function EditExperience() {
@@ -58,7 +62,19 @@ export function EditExperience() {
 
   const {
     date,
-    selectedParticipants
+    selectedParticipants,
+    experienceType,
+    historyLength,
+    rateOfTesting,
+    createdBy,
+    phaseDuration,
+    pendulumRotation,
+    lowSync,
+    highSync,
+    lowSyncColor,
+    midSyncColor,
+    highSyncColor,
+
   } = thisExperience
 
 
@@ -144,13 +160,72 @@ export function EditExperience() {
 
   const series = createSeries()
   const dateStr = new Date(date).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true }) + ', ' + new Date(date).toLocaleDateString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit' })
+
+  const rows = (
+    <Table.Tr flex="col">
+      <Table.Td>{createdBy}</Table.Td>
+      <Table.Td>
+        {new Date(date).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })}
+        {', '}
+        {new Date(date).toLocaleDateString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit' })}
+      </Table.Td>
+      <Table.Td>
+        <Row align={'center'} gap={4}>
+          <Text size={'sm'}>
+            {phaseDuration}s
+          </Text>
+          {experienceType.includes(ExperienceType.Hands) && <IconHandStop stroke={1.1} />}
+          {experienceType.includes(ExperienceType.Pendulum) && (
+            <Row>
+              <IconLollipop style={{ transform: 'rotate(180deg)' }} stroke={1} />
+              <Text fw={500} size={'xs'}>
+                {pendulumRotation}°
+              </Text>
+            </Row>
+          )}
+        </Row>
+      </Table.Td>
+      <Table.Td>
+        <Text fw={500} size={'sm'}>
+          {`${historyLength} x ${rateOfTesting / 1000} ms`}
+        </Text>
+      </Table.Td>
+      <Table.Td>
+        <Row align={'center'} gap={4}>
+          {lowSync}
+          <Circle color={lowSyncColor} />
+
+          <Circle color={midSyncColor} />
+
+          <Circle color={highSyncColor} />
+          {highSync}
+        </Row>
+      </Table.Td>
+    </Table.Tr>
+  )
+
   return (
     <>
       <Title mt={10} mb={20} size="20px">
         {`${selectedParticipants[0].name} & ${selectedParticipants[1].name} - ${dateStr}`}
       </Title>
+
       <Flex wrap="wrap" gap={24}>
         <Flex flex={1} direction="column">
+          <Card mb={20}>
+            <Table>
+              <Table.Thead>
+                <Table.Tr>
+                  <Table.Th>Created By</Table.Th>
+                  <Table.Th>Date</Table.Th>
+                  <Table.Th>Mode</Table.Th>
+                  <Table.Th>History</Table.Th>
+                  <Table.Th>Sync Level</Table.Th>
+                </Table.Tr>
+              </Table.Thead>
+              <Table.Tbody>{rows}</Table.Tbody>
+            </Table>
+          </Card>
           <Card mr={5} mb={20}>
             <Title size="16px" order={2}>
               Synchronization Over Time

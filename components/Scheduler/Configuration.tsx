@@ -62,7 +62,7 @@ export function Configuration({ loading, onCreateSchedule, initialValues, disclo
     selectedParticipants: [],
     phaseDuration: '60s',
     historyLength: 15,
-    rateOfTesting: 150,
+    rateOfTesting: 30,
     highSyncColor: 'rgb(93, 190, 232)',
     midSyncColor: 'rgb(224, 175, 52)',
     lowSyncColor: 'rgb(227, 52, 52)',
@@ -262,8 +262,8 @@ export function Configuration({ loading, onCreateSchedule, initialValues, disclo
             </Row>
           </Column>
           <Column gap={2}>
-            <Input.Wrapper label={"Rate of testing"} description={'How often synchronization is being analyzed'}>
-              <NumberInput mt={2} min={100} max={300} value={rateOfTesting} onChange={handleRateOfTestingChange} suffix='ms' />
+            <Input.Wrapper label={"Rate of sampling"} description={'How often synchronization is being analyzed'}>
+              <NumberInput mt={2} min={25} max={80} value={rateOfTesting} onChange={handleRateOfTestingChange} suffix='ms' />
             </Input.Wrapper>
           </Column>
           <Column w={280}>
