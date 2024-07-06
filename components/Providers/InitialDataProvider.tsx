@@ -13,7 +13,7 @@ export function InitialDataProvider({ children }: InitialDataProviderProps) {
     const [{ schedulerLoading }, setStore] = useContext(StoreContext);
     const fetcher = (url: string) => axios.get(url, {
         headers: {
-            'Cache-Control': 'no-cache'
+            'Cache-Control': 'no-store'
         }
     }).then(res => res.data);
 
