@@ -1,7 +1,7 @@
 'use client'
 import { useUser } from '@auth0/nextjs-auth0/client';
 import { ActionIcon, AppShell, Text, Burger, Card, Flex, Input, Table, Tabs, Title, Box } from "@mantine/core";
-import { useDisclosure } from "@mantine/hooks";
+import { useDisclosure, useViewportSize } from "@mantine/hooks";
 import { IconDoorExit, IconEdit, IconLogout, IconPencil, IconSearch, IconTrash, IconUserEdit } from "@tabler/icons-react";
 import { capitalize } from "lodash";
 import Image from "next/image";
@@ -9,6 +9,7 @@ import { ReactNode, useContext, useEffect, useState } from "react";
 import { StoreContext } from '@/store/context';
 import { TabsValues } from '@/constants';
 import { useRouter } from 'next/navigation';
+import { useUserWithFallback } from '@/lib/useUserWithFallback';
 
 
 interface DashboardProps {
@@ -18,8 +19,9 @@ interface DashboardProps {
 
 export function Dashboard({ page = TabsValues.Scheduler, children }: DashboardProps) {
     const router = useRouter();
+    const { height, width } = useViewportSize();
     const [opened, { toggle }] = useDisclosure();
-    const { user, error, isLoading } = useUser();
+    const { user } = useUserWithFallback();
     const { name } = user || { nickname: "" }
     const [currentValue, setCurrentValue] = useState(page);
     const [animatedNickname, setAnimatedNickname] = useState("");
@@ -65,7 +67,7 @@ export function Dashboard({ page = TabsValues.Scheduler, children }: DashboardPr
                 navbar={{
                     width: 220,
                     breakpoint: 'sm',
-                    collapsed: { mobile: !opened },
+                    collapsed: { mobile: true },
                 }}
                 padding="md"
             >

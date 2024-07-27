@@ -11,11 +11,7 @@ interface InitialDataProviderProps {
 
 export function InitialDataProvider({ children }: InitialDataProviderProps) {
     const [{ schedulerLoading }, setStore] = useContext(StoreContext);
-    const fetcher = (url: string) => axios.post(url, {
-        headers: {
-            'Cache-Control': 'no-store'
-        }
-    }).then(res => res.data);
+    const fetcher = (url: string) => axios.post(url).then(res => res.data);
 
     useSWR('/api/participants/fetch', fetcher, {
         revalidateOnFocus: true,

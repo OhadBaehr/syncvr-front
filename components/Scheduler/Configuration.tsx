@@ -28,12 +28,12 @@ import { Column } from '../Layout/Column';
 import axios from 'axios';
 import { StoreContext } from '@/store/context';
 import { showNotification } from '@mantine/notifications';
-import { useUser } from '@auth0/nextjs-auth0/client';
 import { create } from 'lodash';
 import { Participant, ScheduledExperience } from '@/types';
 
 import { v4 as uuid } from 'uuid';
 import { ExperienceType } from '@/constants';
+import { useUserWithFallback } from '@/lib/useUserWithFallback';
 
 function Swatch({ color = '#2e2e2e', setColor }: { color: string; setColor: (color: string) => void }) {
   return (
@@ -75,7 +75,7 @@ export function Configuration({ loading, onCreateSchedule, initialValues, disclo
 
   const [opened, { close }] = disclosure;
   const [{ participants, scheduled }] = useContext(StoreContext);
-  const { user } = useUser()
+  const { user } = useUserWithFallback()
   const [selectedParticipants, setSelectedParticipants] = useState<Participant[]>(defaultValues.selectedParticipants);
   const [phaseDurationStr, setPhaseDurationStr] = useState(defaultValues.phaseDuration);
   const [historyLength, setHistoryLength] = useState(defaultValues.historyLength);

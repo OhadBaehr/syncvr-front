@@ -12,6 +12,7 @@ import {
   Title,
   Text,
   Button,
+  ScrollArea,
 } from '@mantine/core';
 import { IconHandStop, IconLollipop, IconPencil, IconSearch, IconTrash } from '@tabler/icons-react';
 import { StoreContext } from '@/store/context';
@@ -22,6 +23,7 @@ import { ExperienceType } from '@/constants';
 import { Circle } from '../Atoms/Circle';
 import { Row } from '../Layout/Row';
 import Link from 'next/link';
+import { formatDate } from '@/lib/utils';
 
 export function ExperiencesTable() {
   const [{ experiences, experiencesLoading }, setStore] = useContext(StoreContext);
@@ -63,9 +65,7 @@ export function ExperiencesTable() {
         <Table.Td>{selectedParticipants[0].name}</Table.Td>
         <Table.Td>{selectedParticipants[1].name}</Table.Td>
         <Table.Td>
-          {new Date(date).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })}
-          {', '}
-          {new Date(date).toLocaleDateString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit' })}
+          {formatDate(date)}
         </Table.Td>
         <Table.Td>
           <Row align={'center'} gap={4}>
@@ -119,20 +119,22 @@ export function ExperiencesTable() {
             <Loader />
           </Column>
         ) : (
-          <Table mt={20}>
-            <Table.Thead>
-              <Table.Tr>
-                <Table.Th>Created By</Table.Th>
-                <Table.Th>Participant 1</Table.Th>
-                <Table.Th>Participant 2</Table.Th>
-                <Table.Th>Date</Table.Th>
-                <Table.Th>Avg Sync</Table.Th>
-                <Table.Th>History</Table.Th>
-                <Table.Th>Overview</Table.Th>
-              </Table.Tr>
-            </Table.Thead>
-            <Table.Tbody>{rows}</Table.Tbody>
-          </Table>
+          <ScrollArea>
+            <Table miw={920} mt={20}>
+              <Table.Thead>
+                <Table.Tr>
+                  <Table.Th>Created By</Table.Th>
+                  <Table.Th>Participant 1</Table.Th>
+                  <Table.Th>Participant 2</Table.Th>
+                  <Table.Th>Date</Table.Th>
+                  <Table.Th>Avg Sync</Table.Th>
+                  <Table.Th>History</Table.Th>
+                  <Table.Th>Overview</Table.Th>
+                </Table.Tr>
+              </Table.Thead>
+              <Table.Tbody>{rows}</Table.Tbody>
+            </Table>
+          </ScrollArea>
         )}
       </Card>
     </Flex>

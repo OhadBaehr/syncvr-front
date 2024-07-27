@@ -6,18 +6,37 @@ import { WithId, Document } from 'mongodb';
 export async function POST() {
     try {
         const { db } = await connectToDatabase();
-        const participants = await db.collection('participants').find({}).toArray();
 
-        // Explicitly map documents to Participant type
-        const formattedParticipants: Participant[] = participants.map((participant: WithId<Document>) => ({
-            _id: participant._id,
-            name: participant.name,
-            email: participant.email,
-            sex: participant.sex,
-            lastExperience: participant.lastExperience,
-        }));
+        const pipeline = [
+            {
+                $lookup: {
+                    from: 'scheduled',
+                    let: { participantEmail: '$email' },
+                    pipeline: [
+                        { $unwind: '$selectedParticipants' },
+                        { $match: { $expr: { $eq: ['$selectedParticipants.email', '$$participantEmail'] } } },
+                        { $sort: { date: -1 } },
+                        { $limit: 1 },
+                        { $project: { date: 1 } }
+                    ],
+                    as: 'latestExperience'
+                }
+            },
+            {
+                $addFields: {
+                    lastExperience: { $arrayElemAt: ['$latestExperience.date', 0] }
+                }
+            },
+            {
+                $project: {
+                    latestExperience: 0
+                }
+            }
+        ];
 
-        return NextResponse.json(formattedParticipants, { status: 200 });
+        const participants = await db.collection('participants').aggregate(pipeline).toArray();
+
+        return NextResponse.json(participants, { status: 200 });
     } catch (error: any) {
         return NextResponse.json({ message: error.message }, { status: 500 });
     }

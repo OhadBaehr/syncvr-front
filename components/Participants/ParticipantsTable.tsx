@@ -2,7 +2,7 @@
 import React, { useContext, useState } from 'react';
 import useSWR from 'swr';
 import axios from 'axios';
-import { ActionIcon, Card, Flex, Input, Select, Table, Button, Title, Loader } from '@mantine/core';
+import { ActionIcon, Card, Flex, Input, Select, Table, Button, Title, Loader, ScrollArea } from '@mantine/core';
 import { IconPencil, IconSearch, IconTrash } from '@tabler/icons-react';
 import { StoreContext } from '@/store/context';
 import { Participant } from '@/types';
@@ -10,6 +10,7 @@ import { useDisclosure } from '@mantine/hooks';
 import { NewParticipant } from './NewParticipant';
 import { SearchBar } from '../Atoms/SearchBar';
 import { Column } from '../Layout/Column';
+import { formatDate } from '@/lib/utils';
 
 
 enum SortingOption {
@@ -125,7 +126,9 @@ export function ParticipantsTable() {
       <Table.Td>{element.name}</Table.Td>
       <Table.Td>{element.email}</Table.Td>
       <Table.Td>{element.sex}</Table.Td>
-      <Table.Td>{element.lastExperience}</Table.Td>
+      <Table.Td>
+        {formatDate(element.lastExperience)}
+      </Table.Td>
       <Table.Td>
         <ActionIcon variant="subtle" onClick={() => handleEditClick(element)}>
           <IconPencil color="blue" />
@@ -162,19 +165,21 @@ export function ParticipantsTable() {
             <Loader />
           </Column>
         ) : (
-          <Table mt={20}>
-            <Table.Thead>
-              <Table.Tr>
-                <Table.Th>Name</Table.Th>
-                <Table.Th>Email</Table.Th>
-                <Table.Th>Sex</Table.Th>
-                <Table.Th>Last Experience</Table.Th>
-                <Table.Th>Edit</Table.Th>
-                <Table.Th>Delete</Table.Th>
-              </Table.Tr>
-            </Table.Thead>
-            <Table.Tbody>{rows}</Table.Tbody>
-          </Table>
+          <ScrollArea>
+            <Table miw={660} mt={20}>
+              <Table.Thead>
+                <Table.Tr>
+                  <Table.Th>Name</Table.Th>
+                  <Table.Th>Email</Table.Th>
+                  <Table.Th>Sex</Table.Th>
+                  <Table.Th>Last Experience</Table.Th>
+                  <Table.Th>Edit</Table.Th>
+                  <Table.Th>Delete</Table.Th>
+                </Table.Tr>
+              </Table.Thead>
+              <Table.Tbody>{rows}</Table.Tbody>
+            </Table>
+          </ScrollArea>
         )}
       </Card>
       <NewParticipant

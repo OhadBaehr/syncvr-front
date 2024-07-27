@@ -1,5 +1,5 @@
 'use client';
-import { ActionIcon, Card, Flex, Table, Text, Title, Button, Loader } from '@mantine/core';
+import { ActionIcon, Card, Flex, Table, Text, Title, Button, Loader, ScrollArea } from '@mantine/core';
 import { IconHandStop, IconLollipop, IconPencil, IconTrash } from '@tabler/icons-react';
 import { useDisclosure } from '@mantine/hooks';
 import { Configuration } from './Configuration';
@@ -14,6 +14,7 @@ import { showNotification } from '@mantine/notifications';
 import axios from 'axios';
 import { debounce, set, throttle } from 'lodash';
 import { Column } from '../Layout/Column';
+import { formatDate } from '@/lib/utils';
 
 export function SchedulerTable() {
     const [{ scheduled, schedulerLoading }, setStore] = useContext(StoreContext);
@@ -121,9 +122,7 @@ export function SchedulerTable() {
                 <Table.Td>{selectedParticipants[0].name}</Table.Td>
                 <Table.Td>{selectedParticipants[1].name}</Table.Td>
                 <Table.Td>
-                    {new Date(date).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })}
-                    {', '}
-                    {new Date(date).toLocaleDateString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit' })}
+                    {formatDate(date)}
                 </Table.Td>
                 <Table.Td>
                     <Row align={'center'} gap={4}>
@@ -193,23 +192,25 @@ export function SchedulerTable() {
                         <Loader />
                     </Column>
                 ) : (
-                    <Table mt={20}>
-                        <Table.Thead>
-                            <Table.Tr>
-                                <Table.Th>Created By</Table.Th>
-                                <Table.Th>Participant 1</Table.Th>
-                                <Table.Th>Participant 2</Table.Th>
-                                <Table.Th>Date</Table.Th>
-                                <Table.Th>Mode</Table.Th>
-                                <Table.Th>History</Table.Th>
-                                <Table.Th>Sync Level</Table.Th>
-                                <Table.Th>Session ID</Table.Th>
-                                <Table.Th>Edit</Table.Th>
-                                <Table.Th>Delete</Table.Th>
-                            </Table.Tr>
-                        </Table.Thead>
-                        <Table.Tbody>{rows}</Table.Tbody>
-                    </Table>
+                    <ScrollArea>
+                        <Table miw={1000} mt={20}>
+                            <Table.Thead>
+                                <Table.Tr>
+                                    <Table.Th>Created By</Table.Th>
+                                    <Table.Th>Participant 1</Table.Th>
+                                    <Table.Th>Participant 2</Table.Th>
+                                    <Table.Th>Date</Table.Th>
+                                    <Table.Th>Mode</Table.Th>
+                                    <Table.Th>History</Table.Th>
+                                    <Table.Th>Sync Level</Table.Th>
+                                    <Table.Th>Session ID</Table.Th>
+                                    <Table.Th>Edit</Table.Th>
+                                    <Table.Th>Delete</Table.Th>
+                                </Table.Tr>
+                            </Table.Thead>
+                            <Table.Tbody>{rows}</Table.Tbody>
+                        </Table>
+                    </ScrollArea>
                 )}
 
             </Card>
