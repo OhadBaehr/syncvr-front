@@ -1,11 +1,11 @@
 import { INote } from "@/types";
-import { useUser } from "@auth0/nextjs-auth0/client";
 import { Button, Input, Modal, Textarea } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import axios from "axios";
 import { Dispatch, SetStateAction, useRef, useState } from "react";
 import { v4 as uuid } from "uuid";
 import { showNotification } from "@mantine/notifications";
+import { useUserWithFallback } from "@/lib/useUserWithFallback";
 
 interface EditNoteProps {
     initialValues?: INote | undefined
@@ -15,7 +15,7 @@ interface EditNoteProps {
 }
 
 export function EditNote({ disclosure, initialValues, uniqueId, setNotes }: EditNoteProps) {
-    const { user } = useUser();
+    const { user } = useUserWithFallback();
     const [opened, { close }] = disclosure;
     const [content, setContent] = useState(initialValues?.content || '');
 

@@ -77,7 +77,7 @@ export function ExperiencesTable() {
               <Row>
                 <IconLollipop style={{ transform: 'rotate(180deg)' }} stroke={1} />
                 <Text size={'sm'}>
-                  {avgSyncPendulum.toFixed(2)}%
+                  {avgSyncPendulum?.toFixed(2)}%
                 </Text>
               </Row>
             )}
