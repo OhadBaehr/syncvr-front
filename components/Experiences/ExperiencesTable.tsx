@@ -70,7 +70,7 @@ export function ExperiencesTable() {
         <Table.Td>
           <Row align={'center'} gap={4}>
             <Text size={'sm'}>
-              {avgSyncHands.toFixed(2)}%
+              {avgSyncHands?.toFixed(2)}%
             </Text>
             {experienceType.includes(ExperienceType.Hands) && <IconHandStop stroke={1.1} />}
             {experienceType.includes(ExperienceType.Pendulum) && (
