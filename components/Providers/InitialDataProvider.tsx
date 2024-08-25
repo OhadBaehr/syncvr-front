@@ -9,10 +9,12 @@ interface InitialDataProviderProps {
     children: React.ReactNode;
 }
 
+// Fetch all important data on platform load
 export function InitialDataProvider({ children }: InitialDataProviderProps) {
-    const [{ schedulerLoading }, setStore] = useContext(StoreContext);
+    const [_, setStore] = useContext(StoreContext);
     const fetcher = (url: string) => axios.post(url).then(res => res.data);
 
+    // Fetch all participants on component mount
     useSWR('/api/participants/fetch', fetcher, {
         revalidateOnFocus: true,
         dedupingInterval: 10000,
@@ -21,6 +23,7 @@ export function InitialDataProvider({ children }: InitialDataProviderProps) {
         }
     });
 
+    // Fetch all scheduled (not yet done) experiences on component mount
     useSWR('/api/scheduled/fetch', fetcher, {
         revalidateOnFocus: true,
         dedupingInterval: 10000,
@@ -29,6 +32,7 @@ export function InitialDataProvider({ children }: InitialDataProviderProps) {
         }
     });
 
+    // Fetch all experiences already done on component mount
     useSWR('/api/experiences/fetch', fetcher, {
         revalidateOnFocus: true,
         dedupingInterval: 10000,

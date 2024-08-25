@@ -1,3 +1,4 @@
+// Helper function to format a date
 export function formatDate(date: string | number | Date) {
     try {
         const parsedDate = new Date(date);

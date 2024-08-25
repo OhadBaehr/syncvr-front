@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { connectToDatabase } from '@/lib/mongodb';
 import { Participant } from '@/types';
 
+// Delete a participant by its email
 export async function DELETE(request: Request) {
     const { email }: Participant = await request.json();
 

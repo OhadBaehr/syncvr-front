@@ -2,6 +2,7 @@
 import { ActionIcon, Card, Flex, Group, Text, Title } from '@mantine/core';
 import { IconPencil, IconTrash } from '@tabler/icons-react';
 import type { INote } from '@/types';
+import { formatDate } from '@/lib/utils';
 
 interface NoteProps {
     note: INote
@@ -9,10 +10,11 @@ interface NoteProps {
     onDelete: (note: INote) => void
 }
 
+// Note component for displaying notes in the experience overview
 export function Note({ note, onEdit, onDelete }: NoteProps) {
 
     const { author, content, date } = note;
-    const time = new Date(date).toLocaleDateString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit' }) + ' - ' + new Date(date).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })
+    const time = formatDate(date)
 
     return (
         <Card w="100%">

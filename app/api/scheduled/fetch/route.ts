@@ -1,7 +1,7 @@
 import { connectToDatabase } from "@/lib/mongodb";
 import { NextResponse } from "next/server";
 
-
+// Get all experiences scheduled (not yet done)
 export async function POST() {
     try {
         const { db } = await connectToDatabase();

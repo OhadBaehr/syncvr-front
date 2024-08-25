@@ -1,4 +1,4 @@
-// lib/mongodb.ts
+// Shared mongodb connection (only setup once on server side)
 import { MongoClient, Db } from 'mongodb';
 
 const MONGODB_URI = process.env.MONGODB_URI as string;

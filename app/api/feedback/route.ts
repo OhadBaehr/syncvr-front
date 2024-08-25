@@ -1,6 +1,7 @@
 import { connectToDatabase } from "@/lib/mongodb";
 import { NextResponse } from "next/server";
 
+// Get a specific experience questionnaire and syncronization data by its uniqueId
 export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const uniqueId = searchParams.get('uniqueId');

@@ -5,12 +5,9 @@ import '@mantine/notifications/styles.css';
 import React from 'react';
 import { MantineProvider, ColorSchemeScript } from '@mantine/core';
 import { theme } from '../theme';
-import { StoreContext, StoreContextProvider } from '@/store/context';
+import { StoreContextProvider } from '@/store/context';
 import { UserProvider } from '@auth0/nextjs-auth0/client';
 import { Notifications } from '@mantine/notifications';
-import { Participant, ScheduledExperience } from '@/types';
-import axios from 'axios';
-import useSWR from 'swr';
 import { InitialDataProvider } from '@/components/Providers/InitialDataProvider';
 import { Dashboard } from '@/components/Templates/Dashboard';
 
@@ -19,7 +16,9 @@ export const metadata = {
   description: 'SyncVR Dashboard',
 };
 
-export default function RootLayout({ children }: { children: any }) {
+
+// RootLayout render all pages (children) and setup all the necessary context providers
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <head>

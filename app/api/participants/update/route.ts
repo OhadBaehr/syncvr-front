@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import { connectToDatabase } from '@/lib/mongodb';
 import { Participant } from '@/types';
 
+
+// Update a participant by its email
 export async function PUT(request: Request) {
     const { email, name, sex, lastExperience }: Participant = await request.json();
 

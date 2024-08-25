@@ -3,6 +3,8 @@ import { NextResponse } from 'next/server';
 import { connectToDatabase } from '@/lib/mongodb';
 import { v4 as uuidv4 } from 'uuid';
 
+
+// Get a specific note by its uniqueId
 export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const uniqueId = searchParams.get('uniqueId');
@@ -18,6 +20,7 @@ export async function GET(request: Request) {
     }
 }
 
+// Create a new note
 export async function POST(request: Request) {
     const { content, date, noteId, author, uniqueId } = await request.json();
 
@@ -40,6 +43,7 @@ export async function POST(request: Request) {
 
 
 
+// Edit a specific note by its noteId
 export async function PUT(request: Request) {
     const { content, date, noteId } = await request.json();
 
@@ -70,6 +74,7 @@ export async function PUT(request: Request) {
     }
 }
 
+// Delete a specific note by its uniqueId
 export async function DELETE(request: Request) {
     const { searchParams } = new URL(request.url);
     const noteId = searchParams.get('noteId');

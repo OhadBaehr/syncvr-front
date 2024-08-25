@@ -21,11 +21,14 @@ const initialState: IContext = {
     scheduled: [],
 };
 
+// Setup shared store
 export const StoreContext = createContext([
     initialState,
     (() => { }),
 ] as [IContext, Dispatch<SetStateAction<IContext>>]);
 
+
+// Provider for shared store
 export function StoreContextProvider({ children }: { children: ReactNode }) {
     const [store, setStore] = useState(initialState);
     return (

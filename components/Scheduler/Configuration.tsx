@@ -4,7 +4,6 @@ import {
   Divider,
   MultiSelect,
   Checkbox,
-  Group,
   NumberInput,
   Text,
   ActionIcon,
@@ -25,16 +24,16 @@ import { IconClock } from '@tabler/icons-react';
 import { useDisclosure } from '@mantine/hooks';
 import { Row } from '../Layout/Row';
 import { Column } from '../Layout/Column';
-import axios from 'axios';
 import { StoreContext } from '@/store/context';
 import { showNotification } from '@mantine/notifications';
-import { create } from 'lodash';
 import { Participant, ScheduledExperience } from '@/types';
 
 import { v4 as uuid } from 'uuid';
 import { ExperienceType } from '@/constants';
 import { useUserWithFallback } from '@/lib/useUserWithFallback';
 
+
+// Display and allow to pick a color for each synchronization level
 function Swatch({ color = '#2e2e2e', setColor }: { color: string; setColor: (color: string) => void }) {
   return (
     <Menu>
@@ -57,6 +56,8 @@ interface ConfigurationProps {
   initialValues: ScheduledExperience | undefined
 }
 
+
+// Configuration of the scheduled experience
 export function Configuration({ loading, onCreateSchedule, initialValues, disclosure }: ConfigurationProps) {
   const defaultValues = {
     selectedParticipants: [],
@@ -93,6 +94,7 @@ export function Configuration({ loading, onCreateSchedule, initialValues, disclo
 
   const hourRef = useRef<HTMLInputElement>(null);
 
+  // Set initial values if editing (on component mount)
   useEffect(() => {
     if (initialValues) {
       setSelectedParticipants(initialValues.selectedParticipants)
@@ -125,11 +127,13 @@ export function Configuration({ loading, onCreateSchedule, initialValues, disclo
     }
   }, [initialValues])
 
+
+  // Set participants for the experience after dropdown selection
   const handleSelect = (value: string[]) => {
     setSelectedParticipants(value.map((email) => participants.find((participant) => participant.email === email)!));
   };
 
-
+  // Get the next available schedule id
   function getAvaliableScheduleId() {
     console.log(scheduled)
     let id = 1
@@ -140,6 +144,7 @@ export function Configuration({ loading, onCreateSchedule, initialValues, disclo
     }
     return id.toString()
   }
+
 
   const handlePhaseDurationChange = (value: string) => {
     setPhaseDurationStr(value);
@@ -169,12 +174,15 @@ export function Configuration({ loading, onCreateSchedule, initialValues, disclo
     setPendulumRotationStr(value);
   };
 
+  // Icon (Button) component for date picker
   const pickerControl = (
     <ActionIcon variant="subtle" color="gray" onClick={() => hourRef.current?.showPicker()}>
       <IconClock style={{ width: rem(16), height: rem(16) }} />
     </ActionIcon>
   );
 
+
+  // Add a new experience or edit an existing experience configuration
   const handleSubmit = () => {
     if (!user) return
 

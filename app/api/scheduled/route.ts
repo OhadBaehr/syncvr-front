@@ -1,8 +1,7 @@
 import { NextResponse } from 'next/server';
 import { connectToDatabase } from '@/lib/mongodb';
 
-
-
+// Edit an existing scheduled experience (not yet done)
 export async function PUT(request: Request) {
     const {
         uniqueId,
@@ -70,7 +69,7 @@ export async function PUT(request: Request) {
 }
 
 
-
+// Delete an existing scheduled experience (not yet done)
 export async function DELETE(request: Request) {
     const { searchParams } = new URL(request.url);
     const uniqueId = searchParams.get('uniqueId');
@@ -93,6 +92,7 @@ export async function DELETE(request: Request) {
     }
 }
 
+// Add a new scheduled experience (not yet done)
 export async function POST(request: Request) {
     const {
         sessionId,

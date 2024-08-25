@@ -8,7 +8,8 @@ type SearchBarProps = InputProps & React.HTMLAttributes<HTMLInputElement> & {
     searchingFor: string
 }
 
-export function SearchBar({ onChange, currentNumber, totalNumber, searchingFor}: SearchBarProps) {
+// Generic search bar component
+export function SearchBar({ onChange, currentNumber, totalNumber, searchingFor }: SearchBarProps) {
     return (
         <Input.Wrapper label={`${currentNumber}/${totalNumber} Displayed`}>
             <Input

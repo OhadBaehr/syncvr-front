@@ -1,30 +1,31 @@
 'use client'
 import React, { useContext, useEffect, useState } from 'react';
-import { Title, Card, Input, Select, Flex, Button, Box, Text, Table, ActionIcon } from '@mantine/core';
+import { Title, Card, Input, Select, Flex, Button, Text, Table } from '@mantine/core';
 import { Note } from './Note';
 import { StoreContext } from '@/store/context';
 import { ExperienceType } from '@/constants';
-import { redirect, useParams, useSearchParams } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import useSWR from 'swr';
 import axios from 'axios';
-import { ChartData, Feedback, INote, Participant } from '@/types';
+import { Feedback, INote, Participant } from '@/types';
 import { useDisclosure } from '@mantine/hooks';
 import { EditNote } from './EditNote';
 import { showNotification } from '@mantine/notifications';
 import { AreaChart, AreaChartSeries, BarChart } from '@mantine/charts';
 import { IconHandStop, IconLollipop, IconPencil, IconTrash } from '@tabler/icons-react';
-import Link from 'next/link';
 import { Row } from '../Layout/Row';
 import { Circle } from '../Atoms/Circle';
+import { formatDate } from '@/lib/utils';
 
 
-export function EditExperience() {
+// Specific experience breakdown with charts and notes
+export function ExperienceOverview() {
   const searchParams = useParams();
   const { uniqueId } = searchParams
-  const [{ experiences, experiencesLoading, participants }] = useContext(StoreContext);
+  const [{ experiences, participants }] = useContext(StoreContext);
   const [mode, setMode] = useState(ExperienceType.Hands);
   const disclosure = useDisclosure(false);
-  const [opened, { open, close, toggle }] = disclosure
+  const [_, { open }] = disclosure
 
   const [notes, setNotes] = useState<INote[]>([]);
   const [editNote, setEditNote] = useState<INote | undefined>(undefined)
@@ -33,6 +34,7 @@ export function EditExperience() {
   const [participant1, setParticipant1] = useState<Participant | undefined>(undefined)
   const [participant2, setParticipant2] = useState<Participant | undefined>(undefined)
 
+  // Fetch all notes for the current experience on component mount
   useSWR<INote[]>(`/api/notes?uniqueId=${uniqueId}`, (url: string) => axios.get(url).then(res => res.data), {
     onSuccess: (data) => {
       setNotes(data);
@@ -40,6 +42,7 @@ export function EditExperience() {
   });
 
 
+  // Fetch interpersonal connection form and session syncronization data on component mount
   useSWR<Feedback[]>(`/api/feedback?uniqueId=${uniqueId}`, (url: string) => axios.get(url).then(res => res.data), {
     onSuccess: (data) => {
       setFeedbackP1(data[0]);
@@ -47,6 +50,8 @@ export function EditExperience() {
     }
   });
 
+
+  // Once feedback is received, find the participant details
   useEffect(() => {
     if (feedbackP1) {
       setParticipant1(participants.find(participant => participant.email === feedbackP1.email))
@@ -56,6 +61,8 @@ export function EditExperience() {
     }
   }, [feedbackP1, feedbackP2, participants])
 
+
+  // Get current experience details
   const thisExperience = experiences.find(experience => experience.uniqueId === uniqueId)
 
   if (!thisExperience) return
@@ -74,33 +81,29 @@ export function EditExperience() {
     lowSyncColor,
     midSyncColor,
     highSyncColor,
-
   } = thisExperience
 
 
-
+  // Switch betweeen hands and pendulum mode
   const handleModeChange = (value: ExperienceType) => {
     setMode(value);
   };
 
 
+  // Create dropdown options for mode select (current selection is disabled)
   const selectOptions = [ExperienceType.Hands, ExperienceType.Pendulum].map((option) => ({
     label: option,
     value: option,
     disabled: option === mode,
   }));
 
-  // const algoOptions = ['Pearson', 'Spearman', 'Third'].map((option) => ({
-  //   label: option,
-  //   value: option,
-  //   disabled: option === syncAlgo,
-  // }));
-
+  // Open the note editor modal with current note details
   function onEditNote(note: INote) {
     setEditNote(note)
     open()
   }
 
+  // Delete a note, raise error message if deletion fails
   function onDeleteNote(note: INote) {
     axios.delete(`/api/notes?noteId=${note.noteId}`).then(() => {
       setNotes(prev => prev.filter(note => note.noteId !== note.noteId))
@@ -110,7 +113,7 @@ export function EditExperience() {
     })
   }
 
-
+  // Normalize feedback data for charting
   function normalizeData() {
     if (!feedbackP1 || !participant1?.name) return
     const dataType = mode === ExperienceType.Pendulum ? 'synchronizationPendulum' : 'synchronizationHands'
@@ -133,7 +136,10 @@ export function EditExperience() {
     return data
   }
 
+  // Syncronization chart colors for each participant
   const colors = ['indigo.5', 'violet.7',]
+
+  // Create series for syncronization chart
   function createSeries() {
     const series: AreaChartSeries[] = []
     if (feedbackP1) {
@@ -145,6 +151,10 @@ export function EditExperience() {
     return series
   }
 
+  const series = createSeries()
+
+
+  // Create bar chart data for interpersonal connection form
   function createBarChartData() {
     const p1Answers = feedbackP1?.answers
     const p2Answers = feedbackP2?.answers
@@ -158,16 +168,16 @@ export function EditExperience() {
     return data
   }
 
-  const series = createSeries()
-  const dateStr = new Date(date).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true }) + ', ' + new Date(date).toLocaleDateString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit' })
+
+  // Format date for display
+  const dateStr = formatDate(date)
+
 
   const rows = (
     <Table.Tr flex="col">
       <Table.Td>{createdBy}</Table.Td>
       <Table.Td>
-        {new Date(date).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })}
-        {', '}
-        {new Date(date).toLocaleDateString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit' })}
+        {dateStr}
       </Table.Td>
       <Table.Td>
         <Row align={'center'} gap={4}>
@@ -234,9 +244,6 @@ export function EditExperience() {
               <Input.Wrapper ml="auto" label="Mode">
                 <Select data={selectOptions} value={mode} onChange={(mode => handleModeChange(mode as ExperienceType))} />
               </Input.Wrapper>
-              {/* <Input.Wrapper ml={10} label="Synchronization Algorithm">
-                <Select data={algoOptions} value={syncAlgo} onChange={handleSyncAlgoChange} />
-              </Input.Wrapper> */}
             </Flex>
             <AreaChart
               withLegend

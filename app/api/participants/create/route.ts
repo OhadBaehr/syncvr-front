@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { connectToDatabase } from '@/lib/mongodb';
 import { Participant } from '@/types';
 
+// Create a new participant
 export async function POST(request: Request) {
     const { name, email, sex, lastExperience }: Participant = await request.json();
 

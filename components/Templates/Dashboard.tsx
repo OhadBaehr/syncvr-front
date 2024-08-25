@@ -17,24 +17,25 @@ interface DashboardProps {
     children?: ReactNode
 }
 
+// Dashboard shared layout with tabs and connected user information
 export function Dashboard({ page = TabsValues.Scheduler, children }: DashboardProps) {
     const router = useRouter();
-    const { height, width } = useViewportSize();
-    const [opened, { toggle }] = useDisclosure();
     const { user } = useUserWithFallback();
     const { name } = user || { nickname: "" }
     const [currentValue, setCurrentValue] = useState(page);
     const [animatedNickname, setAnimatedNickname] = useState("");
-    const [store, setStore] = useContext(StoreContext);
-    const [experienceLoading, setExperienceLoading] = useState(true);
 
 
     const pathname = typeof window === 'undefined' ? '' : window.location.pathname
+
+    // Set the current tab based on the URL path
     useEffect(() => {
         const pathSegment = window.location.pathname.split('/')[1];
         setCurrentValue(pathSegment as TabsValues);
     }, [pathname]);
 
+
+    // Animate the user nickname on page load :)
     useEffect(() => {
         if (name) {
             let index = 0;
@@ -52,7 +53,7 @@ export function Dashboard({ page = TabsValues.Scheduler, children }: DashboardPr
         }
     }, [name]);
 
-
+    // Change the tab based on the selected tab
     function handleTabChange(value: TabsValues) {
         const newUrl = `/${value.toLowerCase()}`;
         window.history.pushState(null, '', newUrl);

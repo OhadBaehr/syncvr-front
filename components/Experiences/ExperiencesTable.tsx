@@ -14,22 +14,23 @@ import {
   Button,
   ScrollArea,
 } from '@mantine/core';
-import { IconHandStop, IconLollipop, IconPencil, IconSearch, IconTrash } from '@tabler/icons-react';
+import { IconHandStop, IconLollipop } from '@tabler/icons-react';
 import { StoreContext } from '@/store/context';
-import { EditExperience } from './EditExperience';
 import { Column } from '../Layout/Column';
 import { SearchBar } from '../Atoms/SearchBar';
 import { ExperienceType } from '@/constants';
-import { Circle } from '../Atoms/Circle';
 import { Row } from '../Layout/Row';
 import Link from 'next/link';
 import { formatDate } from '@/lib/utils';
 
+
+// Table displaying all experiences already done
 export function ExperiencesTable() {
-  const [{ experiences, experiencesLoading }, setStore] = useContext(StoreContext);
+  const [{ experiences, experiencesLoading }] = useContext(StoreContext);
 
   const [search, setSearch] = useState('');
 
+  // Filter experiences based on search input
   const filteredExperiences = experiences
     .filter((experience) => {
       return (
@@ -47,6 +48,7 @@ export function ExperiencesTable() {
     })
 
 
+  // Create a row for each experience after search filtering
   const rows = filteredExperiences.map((experience) => {
     const {
       uniqueId,
@@ -69,11 +71,11 @@ export function ExperiencesTable() {
         </Table.Td>
         <Table.Td>
           <Row align={'center'} gap={4}>
-            <Text size={'sm'}>
+            {avgSyncHands && <Text size={'sm'}>
               {avgSyncHands?.toFixed(2)}%
-            </Text>
+            </Text>}
             {experienceType.includes(ExperienceType.Hands) && <IconHandStop stroke={1.1} />}
-            {experienceType.includes(ExperienceType.Pendulum) && (
+            {experienceType.includes(ExperienceType.Pendulum) && avgSyncPendulum && (
               <Row>
                 <IconLollipop style={{ transform: 'rotate(180deg)' }} stroke={1} />
                 <Text size={'sm'}>

@@ -23,11 +23,13 @@ export function SchedulerTable() {
     const [editScheduled, setEditScheduled] = useState<ScheduledExperience | undefined>();
     const [loading, setLoading] = useState(false);
 
+    // Open the modal to edit a scheduled experience
     const handleEditClick = (scheduledExperience: ScheduledExperience) => {
         setEditScheduled(scheduledExperience);
         open();
     };
 
+    // Filter scheduled experiences based on search input
     const filteredScheduled = scheduled
         .filter((scheduledExperience) => {
             return (
@@ -44,6 +46,7 @@ export function SchedulerTable() {
             );
         })
 
+    // Create a new scheduled experience or update an existing one, with debouncing and throttling to prevent multiple requests
     const handleCreateSchedule = debounce(throttle((scheduledExperience: ScheduledExperience) => {
         if (loading) return;
         setLoading(true);
@@ -77,11 +80,14 @@ export function SchedulerTable() {
         }
     }, 5000), 300);
 
+    // Open the modal to create a new scheduled experience
     const handleOpen = () => {
         setEditScheduled(undefined);
         open();
     }
 
+
+    // Delete a scheduled experience
     const deleteScheduled = (scheduledExperience: ScheduledExperience) => {
         axios.delete(`/api/scheduled`, {
             params: { uniqueId: scheduledExperience.uniqueId }
