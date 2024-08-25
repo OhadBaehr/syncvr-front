@@ -25,7 +25,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <ColorSchemeScript />
         <link rel="shortcut icon" href="/assets/logo.svg" type="image/svg+xml" />
         <link rel="icon" href="/assets/logo.svg" type="image/svg+xml" />
-        <link rel="apple-touch-icon" href="/favicon.png" />
         <meta
           name="viewport"
           content="minimum-scale=1, initial-scale=1, width=device-width, user-scalable=no"
